@@ -18,7 +18,9 @@ type UserUseCase interface {
 	UpdateMyProfile(ctx context.Context, id uint, params dto.UpdateUser) (string, *helper.ErrorStruct)
 
 	GetMyAlamat(ctx context.Context, id uint) ([]*dto.AlamatResp, *helper.ErrorStruct)
+	
 	CreateMyNewAlamat(ctx context.Context, id uint, params dto.InserAlamatReq) (*dto.AlamatResp, *helper.ErrorStruct)
+
 	GetMyAlamatById(ctx context.Context, id uint, idAlamat uint) (*dto.AlamatResp, *helper.ErrorStruct)
 	UpdateMyAlamatById(ctx context.Context, id uint, idAlamat uint, params dto.UpdateAlamatReq) (string, *helper.ErrorStruct)
 	DeleteMyAlamatById(ctx context.Context, id uint, idAlamat uint) (string, *helper.ErrorStruct)

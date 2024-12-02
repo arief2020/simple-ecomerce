@@ -10,6 +10,7 @@ import (
 type ProductRepository interface {
 	CreateProduct(ctx context.Context, data entity.Product) (entity.Product, error)
     CreatePhotoProduct(ctx context.Context, data entity.FotoProduct) (entity.FotoProduct, error)
+    CreateLogProduct(ctx context.Context, data entity.LogProduct) (entity.LogProduct, error)
     GetAllProduct(ctx context.Context) ([]entity.Product, error)
     GetProductByID(ctx context.Context, id uint) (entity.Product, error)
     UpdateProductByID(ctx context.Context, id uint, data entity.Product) (string, error)
@@ -120,4 +121,11 @@ func (r *ProductRepositoryImpl) DeleteProductByID(ctx context.Context, id uint) 
         return "", err
     }
     return "Product deleted successfully", nil
+}
+
+func (r *ProductRepositoryImpl) CreateLogProduct(ctx context.Context, data entity.LogProduct) (entity.LogProduct, error) {
+    if err := r.db.WithContext(ctx).Create(&data).Error; err != nil {
+        return data, err
+    }
+    return data, nil
 }

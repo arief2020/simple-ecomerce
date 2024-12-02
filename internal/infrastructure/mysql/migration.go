@@ -17,6 +17,9 @@ func RunMigration(mysqlDB *gorm.DB) {
 		&entity.Category{},
 		&entity.Product{},
 		&entity.FotoProduct{},
+		&entity.Trx{},
+		&entity.LogProduct{},
+		&entity.DetailTrx{},
 	)
 	if err != nil {
 		// helper.Logger(helper.LoggerLevelError, "Failed Database Migrated", err)

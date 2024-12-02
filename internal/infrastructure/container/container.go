@@ -30,6 +30,7 @@ type (
 		TokoUsc  usecase.TokoUseCase
 		CategoryUsc usecase.CategoryUseCase
 		ProductUsc usecase.ProductUseCase
+		TrxUsc usecase.TrxUseCase
 	}
 
 	Apps struct {
@@ -110,6 +111,7 @@ func InitContainer() (cont *Container) {
 	tokoRepo := repository.NewTokoRepository(mysqldb)
 	categoryRepo := repository.NewCategoryRepository(mysqldb)
 	productRepo := repository.NewProductRepository(mysqldb)
+	trxRepo := repository.NewTrxRepository(mysqldb)
 
 	bookUsc := usecase.NewBooksUseCase(bookRepo)
 	authUsc := usecase.NewAuthUseCase(userRepo, provinceCityRepo, tokoRepo)
@@ -118,6 +120,7 @@ func InitContainer() (cont *Container) {
 	tokoUsc := usecase.NewTokoUseCase(tokoRepo)
 	categoryUsc := usecase.NewCategoryUseCase(categoryRepo)
 	productUsc := usecase.NewProductUseCase(productRepo, tokoRepo, userRepo)
+	trxUsc := usecase.NewTrxUseCase(trxRepo, userRepo, productRepo)
 
 	return &Container{
 		Apps:     &apps,
@@ -129,6 +132,7 @@ func InitContainer() (cont *Container) {
 		TokoUsc:  tokoUsc,
 		CategoryUsc: categoryUsc,
 		ProductUsc: productUsc,
+		TrxUsc:  trxUsc,
 	}
 
 }
