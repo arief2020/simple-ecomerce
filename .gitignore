@@ -1,0 +1,6 @@
+.env
+dist/*
+uploads/*
+tmp/*
+hiden/*
+uploads/*
