@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"strconv"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
@@ -71,7 +72,25 @@ func (uc *UserControllerImpl) GetMyAlamat(ctx *fiber.Ctx) error {
 		return helper.BuildResponse(ctx, false, "Invalid user ID", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	res, errStruct := uc.userUsc.GetMyAlamat(ctx.Context(), uint(id))
+	// filter := new(dto.FiltersAlamat)
+	// if err := ctx.QueryParser(filter); err != nil {
+	// 	return helper.BuildResponse(ctx, false, "Failed to parse request body", err.Error(), nil, fiber.StatusBadRequest)
+	// }
+
+	queryJudulAlamat := ctx.Query("judul_alamat")
+
+	var filter dto.FiltersAlamat
+	if queryJudulAlamat != "" {
+		filter.JudulAlamat = queryJudulAlamat
+	}
+
+
+	fmt.Printf("Filter: %+v\n", filter)
+
+
+	res, errStruct := uc.userUsc.GetMyAlamat(ctx.Context(), uint(id), dto.FiltersAlamat{
+		JudulAlamat: filter.JudulAlamat,
+	})
 	if errStruct != nil {
 		return helper.BuildResponse(ctx, false, "Failed to GET data", errStruct.Err, nil, errStruct.Code)
 	}
@@ -96,7 +115,7 @@ func (uc *UserControllerImpl) CreateMyNewAlamat(ctx *fiber.Ctx) error {
 		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errStruct.Err, nil, errStruct.Code)
 	}
 
-	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, res, fiber.StatusCreated)
+	return helper.BuildResponse(ctx, true, "Succeed to POST data", nil, res, fiber.StatusCreated)
 }
 
 func (uc *UserControllerImpl) GetMyAlamatById(ctx *fiber.Ctx) error {
@@ -113,7 +132,7 @@ func (uc *UserControllerImpl) GetMyAlamatById(ctx *fiber.Ctx) error {
 
 	res, errStruct := uc.userUsc.GetMyAlamatById(ctx.Context(), uint(id), uint(idAlamat))
 	if errStruct != nil {
-		return helper.BuildResponse(ctx, false, "Failed to GET data", errStruct.Err, nil, errStruct.Code)
+		return helper.BuildResponse(ctx, false, "Failed to GET data", errStruct.Err.Error(), nil, errStruct.Code)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
@@ -138,7 +157,7 @@ func (uc *UserControllerImpl) UpdateMyAlamatById(ctx *fiber.Ctx) error {
 
 	res, errStruct := uc.userUsc.UpdateMyAlamatById(ctx.Context(), uint(id), uint(idAlamat), *data)
 	if errStruct != nil {
-		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errStruct.Err, nil, errStruct.Code)
+		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errStruct.Err.Error(), nil, errStruct.Code)
 	}
 
 	return helper.BuildResponse(ctx, true, res, nil, "", fiber.StatusOK)
@@ -158,7 +177,7 @@ func (uc *UserControllerImpl) DeleteMyAlamatById(ctx *fiber.Ctx) error {
 
 	res, errStruct := uc.userUsc.DeleteMyAlamatById(ctx.Context(), uint(id), uint(idAlamat))
 	if errStruct != nil {
-		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errStruct.Err, nil, errStruct.Code)
+		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errStruct.Err.Error(), nil, errStruct.Code)
 	}
 
 	return helper.BuildResponse(ctx, true, res, nil, "", fiber.StatusOK)

@@ -2,7 +2,8 @@ package repository
 
 import (
 	"context"
-	"errors"
+	"fmt"
+	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/entity"
 
 	"gorm.io/gorm"
@@ -15,7 +16,7 @@ type UsersRepository interface {
 	GetUserById(ctx context.Context, id uint) (res entity.User, err error)
 	UpdateUserById(ctx context.Context, id uint, data entity.User) (res string, err error)
 	
-	GetAlamatByUserId(ctx context.Context, id uint) (res []entity.Alamat, err error)
+	GetAlamatByUserId(ctx context.Context, id uint, params dto.FiltersAlamat) (res []entity.Alamat, err error)
 	InsertAlamat(ctx context.Context, data entity.Alamat) (res entity.Alamat, err error)
 	GetMyAlamatById(ctx context.Context, id uint, idAlamat uint) (res entity.Alamat, err error)
 	UpdateMyAlamatById(ctx context.Context, id uint, idAlamat uint, data entity.Alamat) (res string, err error)
@@ -113,15 +114,54 @@ func (r *UsersRepositoryImpl) UpdateUserById(ctx context.Context, id uint, data 
 		return res, err
 	}
 
-	return "success", nil
+	return "Succeed to Update data", nil
 }
 
-func (r *UsersRepositoryImpl) GetAlamatByUserId(ctx context.Context, id uint) (res []entity.Alamat, err error) {
-	query := "SELECT * FROM alamats WHERE id_user = ?"
-	if err := r.db.Raw(query, id).Scan(&res).Error; err != nil {
-		return res, err
-	}
-	return res, nil
+// func (r *UsersRepositoryImpl) GetAlamatByUserId(ctx context.Context, id uint, params dto.FiltersAlamat) (res []entity.Alamat, err error) {
+// 	db := r.db
+
+// 	filter := map[string][]any{
+// 		"judul_alamat like ?": {fmt.Sprint("%" + params.JudulAlamat+"%")},
+// 	}
+
+// 	for key, val := range filter {
+// 		db = db.Where(key, val...)
+// 	}
+
+// 	if err := db.Debug().WithContext(ctx).Where("id_user = ?", id).Find(&res).Error; err != nil {
+// 		return res, err
+		
+// 	}
+// 	// query := "SELECT * FROM alamats WHERE id_user = ?"
+// 	// if err := r.db.Raw(query, id).Scan(&res).Error; err != nil {
+// 	// 	return res, err
+// 	// }
+// 	return res, nil
+// }
+
+func (r *UsersRepositoryImpl) GetAlamatByUserId(ctx context.Context, id uint, params dto.FiltersAlamat) (res []entity.Alamat, err error) {
+    db := r.db
+
+    // Validasi dan buat filter
+    filter := map[string][]any{}
+    if params.JudulAlamat != "" {
+        filter["judul_alamat LIKE ?"] = []any{fmt.Sprintf("%%%s%%", params.JudulAlamat)}
+    }
+
+    // Terapkan filter
+    for key, val := range filter {
+        db = db.Where(key, val...)
+    }
+
+    // Tambahkan filter `id_user`
+    db = db.Where("id_user = ?", id)
+
+    // Eksekusi query
+    if err := db.Debug().WithContext(ctx).Find(&res).Error; err != nil {
+        return res, err
+    }
+
+    return res, nil
 }
 
 func (r *UsersRepositoryImpl) InsertAlamat(ctx context.Context, data entity.Alamat) (res entity.Alamat, err error) {
@@ -132,13 +172,17 @@ func (r *UsersRepositoryImpl) InsertAlamat(ctx context.Context, data entity.Alam
 }
 
 func (r *UsersRepositoryImpl) GetMyAlamatById(ctx context.Context, id uint, idAlamat uint) (res entity.Alamat, err error) {
-	query := "SELECT * FROM alamats WHERE id_user = ? AND id = ?"
-	result := r.db.Raw(query, id, idAlamat).Scan(&res)
-	if result.Error != nil {
-		return res, result.Error // Error teknis
-	}
-	if result.RowsAffected == 0 {
-		return res, errors.New("alamat not found") // Error jika data kosong
+	// query := "SELECT * FROM alamats WHERE id_user = ? AND id = ?"
+	// result := r.db.Raw(query, id, idAlamat).Scan(&res)
+	// if result.Error != nil {
+	// 	return res, result.Error // Error teknis
+	// }
+	// if result.RowsAffected == 0 {
+	// 	return res, errors.New("alamat not found") // Error jika data kosong
+	// }
+
+	if err := r.db.WithContext(ctx).Where("id_user = ? AND id = ?", id, idAlamat).First(&res).Error; err != nil {
+		return res, err
 	}
 	return res, nil
 }

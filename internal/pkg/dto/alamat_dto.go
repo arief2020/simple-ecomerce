@@ -15,6 +15,10 @@ type UpdateAlamatReq struct {
 	DetailAlamat string `json:"detail_alamat" validate:"required"`
 }
 
+type FiltersAlamat struct {
+	JudulAlamat string `json:"judul_alamat"`
+}
+
 type AlamatResp struct {
 	Id uint `json:"id"`
 	JudulAlamat  string `json:"judul_alamat" validate:"required"`
@@ -22,3 +26,5 @@ type AlamatResp struct {
 	NoTelp string `json:"no_telp" validate:"required"`
 	DetailAlamat string `json:"detail_alamat" validate:"required"`
 }
+
+
