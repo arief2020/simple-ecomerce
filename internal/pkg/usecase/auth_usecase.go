@@ -42,7 +42,7 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 		fmt.Println(errRepo)
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
-			Err:  errors.New("No Data Users"),
+			Err:  errors.New("No Telp atau kata sandi salah"),
 		}
 	}
 
@@ -65,7 +65,7 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 		fmt.Println("debug 3")
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusUnauthorized,
-			Err:  errors.New("invalid account"),
+			Err:  errors.New("No Telp atau kata sandi salah"),
 		}
 	}
 

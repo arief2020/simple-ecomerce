@@ -63,7 +63,7 @@ func MiddlewareAuth(ctx *fiber.Ctx) error {
 func MiddlewareAdmin(ctx *fiber.Ctx) error {
 	isAdmin := ctx.Locals("isAdmin").(bool)
 	if !isAdmin {
-		return helper.BuildResponse(ctx, false, "You are not admin", nil, nil, fiber.StatusUnauthorized)
+		return helper.BuildResponse(ctx, false, "Failed to POST data", "Unauthorized", nil, fiber.StatusUnauthorized)
 	}
 	return ctx.Next()
 }

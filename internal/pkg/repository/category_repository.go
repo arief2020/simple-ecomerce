@@ -9,7 +9,7 @@ import (
 
 type CategoryRepository interface {
 	GetAllCategory(ctx context.Context) ([]entity.Category, error)
-	GetCategoryByID(ctx context.Context, id uint) (entity.Category, error)
+	GetCategoryByID(ctx context.Context, id uint) (category entity.Category, err error)
 	CreateCategory(ctx context.Context, data entity.Category) (entity.Category, error)
 	UpdateCategoryByID(ctx context.Context, id uint, data entity.Category) (entity.Category, error)
 	DeleteCategoryByID(ctx context.Context, id uint) (string, error)
@@ -33,14 +33,24 @@ func (r *CategoryRepositoryImpl) GetAllCategory(ctx context.Context) ([]entity.C
 	return category, nil
 }
 
-func (r *CategoryRepositoryImpl) GetCategoryByID(ctx context.Context, id uint) (entity.Category, error) {
-	var category entity.Category
-	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
+// func (r *CategoryRepositoryImpl) GetCategoryByID(ctx context.Context, id uint) (entity.Category, error) {
+// 	var category entity.Category
+// 	// if err := r.db.WithContext(ctx).Where("id = ?", id).First(&category).Error; err != nil {
+// 	// 	return category, err
+// 	// }
+// 	if err := r.db.First(&category, id).WithContext(ctx).Error; err != nil {
+// 		return category, err
+// 	}
+// 	return category, nil
+// }
+
+
+func (r *CategoryRepositoryImpl) GetCategoryByID(ctx context.Context, id uint) (category entity.Category, err error) {
+	if err := r.db.First(&category, id).WithContext(ctx).Error; err != nil {
 		return category, err
 	}
 	return category, nil
 }
-
 func (r *CategoryRepositoryImpl) CreateCategory(ctx context.Context, data entity.Category) (entity.Category, error) {
 	if err := r.db.WithContext(ctx).Create(&data).Error; err != nil {
 		return data, err
@@ -56,6 +66,11 @@ func (r *CategoryRepositoryImpl) UpdateCategoryByID(ctx context.Context, id uint
 }
 
 func (r *CategoryRepositoryImpl) DeleteCategoryByID(ctx context.Context, id uint) (string, error) {
+	var data entity.Category
+	if err := r.db.First(&data, id).WithContext(ctx).Error; err != nil {
+		return "Delete category failed", gorm.ErrRecordNotFound
+	}
+
 	if err := r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Category{}).Error; err != nil {
 		return "", err
 	}

@@ -2,10 +2,15 @@ package usecase
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/entity"
 	"tugas_akhir_example/internal/pkg/repository"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type CategoryUseCase interface {
@@ -49,10 +54,22 @@ func (c *CategoryUseCaseImpl) GetAllCategory(ctx context.Context) ([]*dto.Catego
 func (c *CategoryUseCaseImpl) GetCategoryByID(ctx context.Context, id uint) (*dto.CategoryResp, *helper.ErrorStruct) {
 	category, err := c.categoryRepository.GetCategoryByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+		fmt.Println("debug 1")
+		return nil, &helper.ErrorStruct{
+			Code: fiber.StatusNotFound,
+			Err:  errors.New("no data category"),
+	}
+}
 		return nil, &helper.ErrorStruct{
 			Err: err,
 		}
 	}
+
+	fmt.Printf("Category: %+v\n", category)
+	
+	fmt.Printf("Error: %+v\n", err)
+	
 
 	return &dto.CategoryResp{
 		ID:          category.ID,
@@ -95,12 +112,21 @@ func (c *CategoryUseCaseImpl) UpdateCategoryByID(ctx context.Context, id uint, d
 }
 
 func (c *CategoryUseCaseImpl) DeleteCategoryByID(ctx context.Context, id uint) (string, *helper.ErrorStruct) {
-	_, err := c.categoryRepository.DeleteCategoryByID(ctx, id)
+	res, err := c.categoryRepository.DeleteCategoryByID(ctx, id)
 	if err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", &helper.ErrorStruct{
+				Code: fiber.StatusNotFound,
+				Err:  errors.New("record not found"),
+			}
+		}
 		return "", &helper.ErrorStruct{
 			Err: err,
 		}
 	}
+
+	fmt.Printf("res: %+v\n", res)
 
 	return "Succeed to DELETE data", nil
 }

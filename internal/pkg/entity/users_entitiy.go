@@ -7,7 +7,7 @@ import (
 
 type (
 	User struct {
-		// gorm.Model
+		gorm.Model
 		ID        uint `gorm:"primarykey;autoIncrement" json:"id"`
 		Email    string `gorm:"unique" json:"email" validate:"required,email"`
 		Nama     string `gorm:"type:varchar(255)" json:"name" validate:"required"`
@@ -20,9 +20,9 @@ type (
 		IdProvinsi string `gorm:"type:varchar(255)" json:"id_provinsi" validate:"required"`
 		IdKota     string `gorm:"type:varchar(255)" json:"id_kota" validate:"required"`
 		IsAdmin    bool `gorm:"type:bool" json:"is_admin"`
-		CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
-		UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
-		DeletedAt gorm.DeletedAt `gorm:"-"`
+		// CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at"`
+		// UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+		// DeletedAt gorm.DeletedAt `gorm:"-"`
 		Alamat    []Alamat
 	}
 

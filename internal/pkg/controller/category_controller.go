@@ -43,7 +43,10 @@ func (c *CategoryControllerImpl) GetCategoryByID(ctx *fiber.Ctx) error {
 
 	category, errUsc := c.categoryUsc.GetCategoryByID(ctx.Context(), uint(id))
 	if errUsc != nil {
-		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
+		// return ctx.Status(errUsc.Code).JSON(fiber.Map{
+		// 	"error": errUsc.Err.Error(),
+		// })
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, category, fiber.StatusOK)
@@ -90,7 +93,7 @@ func (c *CategoryControllerImpl) DeleteCategoryByID(ctx *fiber.Ctx) error {
 
 	_, errUsc := c.categoryUsc.DeleteCategoryByID(ctx.Context(), uint(id))
 	if errUsc != nil {
-		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errUsc.Err, nil, errUsc.Code)
+		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errUsc.Err.Error(), nil, errUsc.Code)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to DELETE data", nil, "", fiber.StatusOK)

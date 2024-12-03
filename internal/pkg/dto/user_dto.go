@@ -37,8 +37,8 @@ type LoginRes struct {
 	Tentang      string `json:"tentang"`
 	Pekerjaan    string `json:"pekerjaan"`
 	Email        string `json:"email"`
-	IdKota       *CityResp `json:"id_kota"`
 	IdProvinsi   *ProvinceResp `json:"id_provinsi"`
+	IdKota       *CityResp `json:"id_kota"`
 	Token        string `json:"token"`
 }
 

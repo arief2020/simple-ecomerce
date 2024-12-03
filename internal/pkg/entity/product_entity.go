@@ -19,13 +19,3 @@ type Product struct {
 	// UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
 	// DeletedAt gorm.DeletedAt `gorm:"-" json:"deleted_at"`
 }
-
-// func (product *Product) AfterCreate(tx *gorm.DB) (err error) {
-//     for i := range product.FotoProduct {
-//         product.FotoProduct[i].ProductID = product.ID
-//         if err := tx.Create(&product.FotoProduct[i]).Error; err != nil {
-//             return err
-//         }
-//     }
-//     return nil
-// }
