@@ -60,7 +60,7 @@ func (c *TokoControllerImpl) GetMyToko(ctx *fiber.Ctx) error {
 
 func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 
-	id, err := ctx.ParamsInt("id")
+	id, err := ctx.ParamsInt("id_toko")
 	if err != nil {
 		return helper.ResponseWithJSON(&helper.JSONRespArgs{
 			Ctx:        ctx,
@@ -69,13 +69,9 @@ func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 		})
 	}
 
-	toko, err := c.tokoUsc.GetTokoByID(ctx.Context(), uint(id))
-	if err != nil {
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{err.Error()},
-		})
+	toko, errUsc := c.tokoUsc.GetTokoByID(ctx.Context(), uint(id))
+	if errUsc != nil {
+		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.ResponseWithJSON(&helper.JSONRespArgs{
@@ -87,13 +83,18 @@ func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 
 func (c *TokoControllerImpl) GetAllToko(ctx *fiber.Ctx) error {
 
-	toko, err := c.tokoUsc.GetAllToko(ctx.Context())
+    filter := new(dto.TokoFilter)
+    if err := ctx.QueryParser(filter); err != nil {
+        return helper.BuildResponse(ctx, false, "Failed to GET data", "Failed to parse request query", nil, fiber.StatusBadRequest)
+    }
+
+    toko, err := c.tokoUsc.GetAllToko(ctx.Context(), dto.TokoFilter{
+        Nama: filter.Nama,
+        Limit:    filter.Limit,
+        Page:     filter.Page,
+    })
 	if err != nil {
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{err.Error()},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", err.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.ResponseWithJSON(&helper.JSONRespArgs{

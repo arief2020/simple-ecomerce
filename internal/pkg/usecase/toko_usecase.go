@@ -12,11 +12,11 @@ import (
 )
 
 type TokoUseCase interface {
-	GetMyToko(ctx context.Context, id uint) ( *dto.TokoResp, error)
+	GetMyToko(ctx context.Context, id uint) ( *dto.MyTokoResp, error)
 	UpdateMyToko(ctx context.Context, userId uint, idToko uint, params *dto.UpdateProfileTokoReq, file *multipart.FileHeader) (string, *helper.ErrorStruct)
 
-	GetAllToko(ctx context.Context) ([]*dto.TokoResp, error)
-	GetTokoByID(ctx context.Context, id uint) (*dto.TokoResp, error)
+	GetAllToko(ctx context.Context, params dto.TokoFilter) (*dto.AllTokoResp, *helper.ErrorStruct)
+	GetTokoByID(ctx context.Context, id uint) (*dto.MyTokoResp, *helper.ErrorStruct)
 }
 
 type TokoUseCaseImpl struct {
@@ -29,12 +29,12 @@ func NewTokoUseCase(tokoRepository repository.TokoRepository) TokoUseCase {
 	}
 }
 
-func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.TokoResp, error) {
+func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.MyTokoResp, error) {
 	toko, err := t.tokoRepository.GetTokoById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return &dto.TokoResp{
+	return &dto.MyTokoResp{
 		ID:        toko.ID,
 		NamaToko:  toko.NamaToko,
 		UrlFoto:   toko.UrlFoto,
@@ -43,12 +43,15 @@ func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.TokoResp
 }
 
 
-func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.TokoResp, error) {
+func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.MyTokoResp, *helper.ErrorStruct) {
 	toko, err := t.tokoRepository.GetTokoById(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, &helper.ErrorStruct{
+			Code: fiber.StatusBadRequest,
+			Err:     errors.New("Toko tidak ditemukan"),
+		}
 	}
-	return &dto.TokoResp{
+	return &dto.MyTokoResp{
 		ID:        toko.ID,
 		NamaToko:  toko.NamaToko,
 		UrlFoto:   toko.UrlFoto,
@@ -56,22 +59,47 @@ func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.TokoRe
 	}, nil
 }
 
-func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context) ([]*dto.TokoResp, error) {
-	toko, err := t.tokoRepository.GetAllToko(ctx)
-	if err != nil {
-		return nil, err
+func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context, params dto.TokoFilter) (*dto.AllTokoResp, *helper.ErrorStruct) {
+	if params.Limit < 1 {
+		params.Limit = 10
 	}
 
-	var tokoResp []*dto.TokoResp
+	if params.Page < 1 {
+		params.Page = 0
+	} else {
+		params.Page = (params.Page - 1) * params.Limit
+	}
+	
+	toko, err := t.tokoRepository.GetAllToko(ctx, dto.TokoFilter{
+		Limit: params.Limit,
+		Page:  params.Page,
+		Nama: params.Nama,
+	})
+	if err != nil {
+		return nil, &helper.ErrorStruct{
+			Code: fiber.StatusBadRequest,
+			Err:     errors.New("toko tidak ditemukan"),
+		}
+	}
+
+	allTokoResp := &dto.AllTokoResp{
+		Page:  params.Page/params.Limit + 1,
+		Limit: params.Limit,
+	}
+
+	var tokoResp []dto.TokoResp
+
+
+
 	for _, toko := range toko {
-		tokoResp = append(tokoResp, &dto.TokoResp{
+		tokoResp = append(tokoResp, dto.TokoResp{
 			ID:        toko.ID,
 			NamaToko:  toko.NamaToko,
 			UrlFoto:   toko.UrlFoto,
-			UserID:    toko.UserID,
 		})
 	}
-	return tokoResp, nil
+	allTokoResp.Data = tokoResp
+	return allTokoResp, nil
 }
 
 func (t *TokoUseCaseImpl) UpdateMyToko(ctx context.Context, userId uint, idToko uint, data *dto.UpdateProfileTokoReq, file *multipart.FileHeader) (string, *helper.ErrorStruct) {
