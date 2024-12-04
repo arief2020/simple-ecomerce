@@ -44,7 +44,6 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 		}
 	}
 
-	// dataLogProducts := []entity.LogProduct{}
 	dataDetailsTrx := []entity.DetailTrx{}
 	trxTotal := 0
 	
@@ -72,11 +71,10 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 			HargaKonsumen: resRepoProduct.HargaKonsumen,
 			Stok: resRepoProduct.Stok,
 			Deskripsi: resRepoProduct.Deskripsi,
-			TokoID: resRepoProduct.TokoID,
-			CategoryID: resRepoProduct.CategoryID,
+			TokoID: resRepoProduct.Toko.ID,
+			CategoryID: resRepoProduct.Category.ID,
 		}
 
-		// ubah perintah menjadi create log product
 		resRepoLogProduct, errRepoLogProduct := t.productRepo.CreateLogProduct(ctx, dataLogProduct)
 		if errRepoLogProduct != nil {
 			return 0, &helper.ErrorStruct{
@@ -92,9 +90,8 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 		trxTotal += detailTrxTotal
 
 		dataDetailTrx := &entity.DetailTrx{
-			// TrxID: trxDto.ID, // pastikan transaksi id sudah terbuat
-			LogProductId: resRepoLogProduct.ID, //ubah ke hasil create log product id
-			TokoID: resRepoProduct.TokoID,
+			LogProductId: resRepoLogProduct.ID, 
+			TokoID: resRepoProduct.Toko.ID,
 			Kuantitas: detailTrx.Kuantitas,
 			HargaTotal: detailTrxTotal,
 		}

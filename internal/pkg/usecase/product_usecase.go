@@ -11,11 +11,12 @@ import (
 	"tugas_akhir_example/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type ProductUseCase interface {
 	CreateProduct(ctx context.Context, product dto.ProductCreateReq, photos []*multipart.FileHeader, userId uint) (int, *helper.ErrorStruct)
-	GetAllProduct(ctx context.Context) ([]dto.ProductResp, *helper.ErrorStruct)
+	GetAllProduct(ctx context.Context, params dto.AllProductFilter) (*dto.AllProductResp, *helper.ErrorStruct)
 	GetProductByID(ctx context.Context, id uint) (*dto.ProductResp, *helper.ErrorStruct)
 	UpdateProductByID(ctx context.Context, id uint, product dto.ProductUpdateReq) (string, *helper.ErrorStruct)
 	DeleteProductByID(ctx context.Context, id uint) (string, *helper.ErrorStruct)
@@ -96,8 +97,30 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 	return int(resCreateRepo.ID), nil
 }
 
-func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context) ([]dto.ProductResp, *helper.ErrorStruct) {
-	resRepo, errRepo := u.productRepo.GetAllProduct(ctx)
+func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllProductFilter) (*dto.AllProductResp, *helper.ErrorStruct) {
+	if params.Limit < 1 {
+		params.Limit = 10
+	}
+
+	if params.Page < 1 {
+		params.Page = 0
+	} else {
+		params.Page = (params.Page - 1) * params.Limit
+	}
+
+	// uintMaxHarga := utils.StringToUint(params.MaxHarga)
+
+	// uintMinHarga := utils.StringToUint(params.MinHarga)
+
+	resRepo, errRepo := u.productRepo.GetAllProduct(ctx, dto.AllProductFilter{
+		Limit:  params.Limit,
+		Page: params.Page,
+		NamaProduk:  params.NamaProduk,
+		CategoryID:  params.CategoryID,
+		TokoID:  params.TokoID,
+		MaxHarga:  params.MinHarga,
+		MinHarga:  params.MinHarga,
+	})
 	if errRepo != nil {
 		return nil, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
@@ -112,15 +135,27 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context) ([]dto.ProductRe
 			HargaKonsumen:  product.HargaKonsumen,
 			Stok:           product.Stok,
 			Deskripsi:      product.Deskripsi,
+			Toko:           product.Toko,
+			Category:       product.Category,
+			Photos:         product.Photos,
 		})
 	}
 
-	return data, nil
+	resp := &dto.AllProductResp{
+		Data: data,
+		Page: params.Page/params.Limit + 1,
+		Limit: params.Limit,
+	}
+
+	return resp, nil
 }
 
 func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.ProductResp, *helper.ErrorStruct) {
 	resRepo, errRepo := u.productRepo.GetProductByID(ctx, id)
 	if errRepo != nil {
+		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			return nil, &helper.ErrorStruct{Code: fiber.StatusNotFound, Err: errors.New("no data product")}
+		}
 		return nil, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -132,6 +167,9 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 		HargaKonsumen:  resRepo.HargaKonsumen,
 		Stok:           resRepo.Stok,
 		Deskripsi:      resRepo.Deskripsi,
+		Toko:           resRepo.Toko,
+		Category:       resRepo.Category,
+		Photos:         resRepo.Photos,
 	}
 
 	return &data, nil

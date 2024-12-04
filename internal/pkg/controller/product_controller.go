@@ -99,7 +99,19 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 }
 
 func (c *ProductControllerImpl) GetAllProduct(ctx *fiber.Ctx) error {
-	resUsc, errUsc := c.productUsc.GetAllProduct(ctx.Context())
+	filter := new(dto.AllProductFilter)
+	if err := ctx.QueryParser(filter); err != nil {
+		return helper.BuildResponse(ctx, false, "Failed to parse query params", err.Error(), nil, fiber.StatusBadRequest)
+	}
+	resUsc, errUsc := c.productUsc.GetAllProduct(ctx.Context(), dto.AllProductFilter{
+		NamaProduk: filter.NamaProduk,
+		CategoryID: filter.CategoryID,
+		TokoID: filter.TokoID,
+		MinHarga: filter.MinHarga,
+		MaxHarga: filter.MaxHarga,
+		Limit: filter.Limit,
+		Page: filter.Page,
+	})
 	if errUsc != nil {
 		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc, nil, fiber.StatusBadRequest)
 	}
@@ -112,7 +124,7 @@ func (c *ProductControllerImpl) GetProductByID(ctx *fiber.Ctx) error {
 	productId := utils.StringToUint(id)
 	resUsc, errUsc := c.productUsc.GetProductByID(ctx.Context(), uint(productId))
 	if errUsc != nil {
-		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, resUsc, fiber.StatusOK)
@@ -123,7 +135,7 @@ func (c *ProductControllerImpl) DeleteProductByID(ctx *fiber.Ctx) error {
 	productId := utils.StringToUint(id)
 	_, errUsc := c.productUsc.DeleteProductByID(ctx.Context(), uint(productId))
 	if errUsc != nil {
-		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errUsc, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to DELETE data", nil, "", fiber.StatusOK)
