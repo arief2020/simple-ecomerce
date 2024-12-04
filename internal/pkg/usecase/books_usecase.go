@@ -53,7 +53,7 @@ func (alc *BooksUseCaseImpl) GetAllBooks(ctx context.Context, params booksmodel.
 	if errors.Is(errRepo, gorm.ErrRecordNotFound) {
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
-			Err:  errors.New("No Data Books"),
+			Err:  errors.New("no data books"),
 		}
 	}
 
@@ -82,7 +82,7 @@ func (alc *BooksUseCaseImpl) GetBooksByID(ctx context.Context, booksid string) (
 	if errors.Is(errRepo, gorm.ErrRecordNotFound) {
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
-			Err:  errors.New("No Data Books"),
+			Err:  errors.New("no data books"),
 		}
 	}
 

@@ -42,7 +42,7 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 		fmt.Println(errRepo)
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
-			Err:  errors.New("No Telp atau kata sandi salah"),
+			Err:  errors.New("no telp atau kata sandi salah"),
 		}
 	}
 
@@ -65,7 +65,7 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 		fmt.Println("debug 3")
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusUnauthorized,
-			Err:  errors.New("No Telp atau kata sandi salah"),
+			Err:  errors.New("no telp atau kata sandi salah"),
 		}
 	}
 
@@ -182,7 +182,7 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 	}
 
 	TanggalLahirParse, errParse := utils.ParseDate(params.TanggalLahir)
-	if err != nil {
+	if errParse != nil {
 		log.Println(err)
 		err = &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
@@ -222,7 +222,7 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 	})
 	if errRepoToko != nil {
 		// helper.Logger(helper.LoggerLevelError, fmt.Sprintf("Error at CreateToko : %s", errRepo.Error()), errRepo)
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at CreateToko : %s", errRepo.Error()))
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at CreateToko : %s", errRepo))
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errRepo,

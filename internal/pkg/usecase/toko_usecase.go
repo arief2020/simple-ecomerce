@@ -48,7 +48,7 @@ func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.MyToko
 	if err != nil {
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
-			Err:     errors.New("Toko tidak ditemukan"),
+			Err:     errors.New("toko tidak ditemukan"),
 		}
 	}
 	return &dto.MyTokoResp{
