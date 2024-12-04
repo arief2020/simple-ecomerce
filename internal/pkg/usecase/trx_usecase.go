@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 	"tugas_akhir_example/internal/helper"
@@ -11,12 +12,14 @@ import (
 	"tugas_akhir_example/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type TrxUseCase interface {
 	CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint ) (int, *helper.ErrorStruct)
-	GetAllTransctionByUserID(ctx context.Context, userId uint) ([]entity.Trx, *helper.ErrorStruct)
-	GetTransactionByID(ctx context.Context, trxId uint, userId uint) (entity.Trx, *helper.ErrorStruct)
+	// GetAllTransctionByUserID(ctx context.Context, userId uint) ([]entity.Trx, *helper.ErrorStruct)
+	GetAllTransaction(ctx context.Context, req dto.AllTransactionReq, userId uint) (*dto.AllTransactionResponse, *helper.ErrorStruct)
+	GetTransactionByID(ctx context.Context, trxId uint, userId uint) (*dto.TransactionResponse, *helper.ErrorStruct)
 }
 
 type TrxUseCaseImpl struct {
@@ -131,24 +134,199 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 	return int(resRepoTrx.ID), nil
 }
 
-func (t *TrxUseCaseImpl) GetAllTransctionByUserID(ctx context.Context, userId uint) ([]entity.Trx, *helper.ErrorStruct) {
-	resRepoTrx, errRepoTrx := t.trxRepo.GetAllTrxByUserID(ctx, userId)
-	if errRepoTrx != nil {
-		return nil, &helper.ErrorStruct{
-			Err: errRepoTrx,
-			Code: fiber.StatusBadRequest,
-		}
-	}
-	return resRepoTrx, nil
-}
+// func (t *TrxUseCaseImpl) GetAllTransctionByUserID(ctx context.Context, userId uint) ([]entity.Trx, *helper.ErrorStruct) {
+// 	resRepoTrx, errRepoTrx := t.trxRepo.GetAllTrxByUserID(ctx, userId)
+// 	if errRepoTrx != nil {
+// 		return nil, &helper.ErrorStruct{
+// 			Err: errRepoTrx,
+// 			Code: fiber.StatusBadRequest,
+// 		}
+// 	}
+// 	return resRepoTrx, nil
+// }
 
-func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, userId uint) (entity.Trx, *helper.ErrorStruct) {
+// func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, userId uint) (*dto.TransactionResponse, *helper.ErrorStruct) {
+// 	resRepoTrx, errRepoTrx := t.trxRepo.GetTrxByID(ctx, trxId, userId)
+// 	if errRepoTrx != nil {
+// 		return nil, &helper.ErrorStruct{
+// 			Err: errors.New("no data trx"),
+// 			Code: fiber.StatusBadRequest,
+// 		}
+// 	}
+// 	dataResp := &dto.TransactionResponse{
+// 		ID: int(resRepoTrx.ID),
+// 		HargaTotal: resRepoTrx.HargaTotal,
+// 		KodeInvoice: resRepoTrx.KodeInvoice,
+// 		MethodBayar: resRepoTrx.MethodBayar,
+// 		AlamatKirim: dto.AlamatResp{
+// 			Id: resRepoTrx.AlamatID,
+// 			JudulAlamat: resRepoTrx.Alamat.JudulAlamat,
+// 			NamaPenerima: resRepoTrx.Alamat.NamaPenerima,
+// 			NoTelp: resRepoTrx.Alamat.NoTelp,
+// 			DetailAlamat: resRepoTrx.Alamat.DetailAlamat,
+// 		},
+// 		DetailTrx: nil,
+// 	}
+// 	return dataResp, nil
+// }
+
+func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, userId uint) (*dto.TransactionResponse, *helper.ErrorStruct) {
+	// Ambil data transaksi dari repository
 	resRepoTrx, errRepoTrx := t.trxRepo.GetTrxByID(ctx, trxId, userId)
 	if errRepoTrx != nil {
-		return entity.Trx{}, &helper.ErrorStruct{
-			Err: errRepoTrx,
-			Code: fiber.StatusBadRequest,
+		if errors.Is(errRepoTrx, gorm.ErrRecordNotFound) {
+			return nil, &helper.ErrorStruct{
+				Err:  errors.New("transaction not found"),
+				Code: fiber.StatusNotFound,
+			}
+		}
+		return nil, &helper.ErrorStruct{
+			Err:  errRepoTrx,
+			Code: fiber.StatusInternalServerError,
 		}
 	}
-	return resRepoTrx, nil
+
+	// Bangun detail transaksi
+	var detailTrx []dto.DetailTrx
+	for _, detail := range resRepoTrx.DetailTrx {
+		detailTrx = append(detailTrx, dto.DetailTrx{
+			Product: dto.TransactionProductResp{
+				ID:             detail.LogProduct.ID,
+				NamaProduk:     detail.LogProduct.NamaProduk,
+				Slug:           detail.LogProduct.Slug,
+				HargaReseller:  detail.LogProduct.HargaReseller,
+				HargaKonsumen:  detail.LogProduct.HargaKonsumen,
+				Deskripsi:      detail.LogProduct.Deskripsi,
+				Toko:           dto.TokoResp{
+					ID:       detail.LogProduct.Toko.ID,
+					NamaToko: detail.LogProduct.Toko.NamaToko,
+					UrlFoto:  detail.LogProduct.Toko.UrlFoto,
+				},
+				Category:       dto.CategoryResp{
+					ID:           detail.LogProduct.Category.ID,
+					NamaCategory: detail.LogProduct.Category.NamaCategory,
+				},
+				Photos:         mapPhotos(detail.LogProduct.Product.FotoProduct),
+			},
+			Toko: dto.TokoResp{
+				ID:       detail.LogProduct.Toko.ID,
+				NamaToko: detail.LogProduct.Toko.NamaToko,
+				UrlFoto:  detail.LogProduct.Toko.UrlFoto,
+			},
+			Kuantitas:  detail.Kuantitas,
+			HargaTotal: detail.HargaTotal,
+		})
+	}
+
+	// Bangun response transaksi
+	dataResp := &dto.TransactionResponse{
+		ID:          int(resRepoTrx.ID),
+		HargaTotal:  resRepoTrx.HargaTotal,
+		KodeInvoice: resRepoTrx.KodeInvoice,
+		MethodBayar: resRepoTrx.MethodBayar,
+		AlamatKirim: dto.AlamatResp{
+			Id:           resRepoTrx.AlamatID,
+			JudulAlamat:  resRepoTrx.Alamat.JudulAlamat,
+			NamaPenerima: resRepoTrx.Alamat.NamaPenerima,
+			NoTelp:       resRepoTrx.Alamat.NoTelp,
+			DetailAlamat: resRepoTrx.Alamat.DetailAlamat,
+		},
+		DetailTrx: detailTrx,
+	}
+
+	return dataResp, nil
+}
+
+
+func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTransactionReq, userId uint) (*dto.AllTransactionResponse, *helper.ErrorStruct) {
+	// Default pagination
+	if req.Limit < 1 {
+		req.Limit = 10
+	}
+	if req.Page < 1 {
+		req.Page = 1
+	}
+
+	// Ambil data dari repository
+	transactions, _, err := t.trxRepo.GetAllTransaction(ctx, req, userId)
+	if err != nil {
+		return nil, &helper.ErrorStruct{
+			Err:  err,
+			Code: fiber.StatusInternalServerError,
+		}
+	}
+
+	// Bangun respons transaksi
+	var transactionResponses []dto.TransactionResponse
+	for _, trx := range transactions {
+		// Detail transaksi
+		var detailTrx []dto.DetailTrx
+		for _, detail := range trx.DetailTrx {
+			detailTrx = append(detailTrx, dto.DetailTrx{
+				Product: dto.TransactionProductResp{
+					ID:             detail.LogProduct.ID,
+				NamaProduk:     detail.LogProduct.NamaProduk,
+				Slug:           detail.LogProduct.Slug,
+				HargaReseller:  detail.LogProduct.HargaReseller,
+				HargaKonsumen:  detail.LogProduct.HargaKonsumen,
+				Deskripsi:      detail.LogProduct.Deskripsi,
+				Toko:           dto.TokoResp{
+					ID:       detail.LogProduct.Toko.ID,
+					NamaToko: detail.LogProduct.Toko.NamaToko,
+					UrlFoto:  detail.LogProduct.Toko.UrlFoto,
+				},
+				Category:       dto.CategoryResp{
+					ID:           detail.LogProduct.Category.ID,
+					NamaCategory: detail.LogProduct.Category.NamaCategory,
+				},
+				Photos:         mapPhotos(detail.LogProduct.Product.FotoProduct),
+				},
+				Toko: dto.TokoResp{
+				ID:       detail.LogProduct.Toko.ID,
+				NamaToko: detail.LogProduct.Toko.NamaToko,
+				UrlFoto:  detail.LogProduct.Toko.UrlFoto,
+			},
+				Kuantitas:  detail.Kuantitas,
+				HargaTotal: detail.HargaTotal,
+			})
+		}
+
+		// Respons transaksi
+		transactionResponses = append(transactionResponses, dto.TransactionResponse{
+			ID:          int(trx.ID),
+			HargaTotal:  trx.HargaTotal,
+			KodeInvoice: trx.KodeInvoice,
+			MethodBayar: trx.MethodBayar,
+			AlamatKirim: dto.AlamatResp{
+				Id:           trx.AlamatID,
+				JudulAlamat:  trx.Alamat.JudulAlamat,
+				NamaPenerima: trx.Alamat.NamaPenerima,
+				NoTelp:       trx.Alamat.NoTelp,
+				DetailAlamat: trx.Alamat.DetailAlamat,
+			},
+			DetailTrx: detailTrx,
+		})
+	}
+
+	// Bangun respons utama
+	response := &dto.AllTransactionResponse{
+		Data:  transactionResponses,
+		Page:  req.Page,
+		Limit: req.Limit,
+	}
+
+	return response, nil
+}
+
+// Helper untuk memetakan foto produk
+func mapPhotos(photos []entity.FotoProduct) []dto.PhotoProductResp {
+	var photoResps []dto.PhotoProductResp
+	for _, photo := range photos {
+		photoResps = append(photoResps, dto.PhotoProductResp{
+			Id:  photo.ID,
+			ProductID: photo.ProductID,
+			Url: photo.UrlFoto,
+		})
+	}
+	return photoResps
 }

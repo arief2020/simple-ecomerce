@@ -19,4 +19,5 @@ type LogProduct struct {
 
 	Product Product
 	Category Category
+	Toko Toko
 }

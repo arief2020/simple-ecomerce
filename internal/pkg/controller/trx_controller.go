@@ -57,7 +57,16 @@ func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 
 	userIdUint := utils.StringToUint(userId)
 
-	resUsc, errUsc := t.trxUsc.GetAllTransctionByUserID(ctx.Context(), uint(userIdUint))
+	filter := new(dto.AllTransactionReq)
+	if err := ctx.QueryParser(filter); err != nil {
+		return helper.BuildResponse(ctx, false, "Failed to parse query params", err.Error(), nil, fiber.StatusBadRequest)
+	}
+
+	resUsc, errUsc := t.trxUsc.GetAllTransaction(ctx.Context(), dto.AllTransactionReq{
+		Limit: filter.Limit,
+		Page: filter.Page,
+		Search: filter.Search,
+	}, uint(userIdUint))
 
 	if errUsc != nil {
 		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc, nil, fiber.StatusBadRequest)
@@ -79,7 +88,7 @@ func (t *TrxControllerImpl) GetTransactionByID(ctx *fiber.Ctx) error {
 	resUsc, errUsc := t.trxUsc.GetTransactionByID(ctx.Context(), uint(id), uint(uintUserId))
 
 	if errUsc != nil {
-		return helper.BuildResponse(ctx, false, "Failed to GET data 2", errUsc, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to GET data 2", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	// Kembalikan request sebagai respons
