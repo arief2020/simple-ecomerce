@@ -7,12 +7,13 @@ import (
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/repository"
+	"tugas_akhir_example/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type TokoUseCase interface {
-	GetMyToko(ctx context.Context, id uint) ( *dto.MyTokoResp, error)
+	GetMyToko(ctx context.Context, id uint) ( *dto.MyTokoResp, *helper.ErrorStruct)
 	UpdateMyToko(ctx context.Context, userId uint, idToko uint, params *dto.UpdateProfileTokoReq, file *multipart.FileHeader) (string, *helper.ErrorStruct)
 
 	GetAllToko(ctx context.Context, params dto.TokoFilter) (*dto.AllTokoResp, *helper.ErrorStruct)
@@ -29,10 +30,14 @@ func NewTokoUseCase(tokoRepository repository.TokoRepository) TokoUseCase {
 	}
 }
 
-func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.MyTokoResp, error) {
+func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.MyTokoResp, *helper.ErrorStruct) {
 	toko, err := t.tokoRepository.GetTokoByUserId(ctx, id)
 	if err != nil {
-		return nil, err
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Toko")
+		return nil, &helper.ErrorStruct{
+			Code: fiber.StatusBadRequest,
+			Err:     errors.New("toko tidak ditemukan"),
+		}
 	}
 	return &dto.MyTokoResp{
 		ID:        toko.ID,
@@ -46,6 +51,7 @@ func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.MyTokoRe
 func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.TokoResp, *helper.ErrorStruct) {
 	toko, err := t.tokoRepository.GetTokoById(ctx, id)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By ID")
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:     errors.New("toko tidak ditemukan"),
@@ -55,7 +61,6 @@ func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.TokoRe
 		ID:        toko.ID,
 		NamaToko:  toko.NamaToko,
 		UrlFoto:   toko.UrlFoto,
-		// UserID:    toko.UserID,
 	}, nil
 }
 
@@ -76,6 +81,7 @@ func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context, params dto.TokoFilter)
 		Nama: params.Nama,
 	})
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Toko")
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:     errors.New("toko tidak ditemukan"),
@@ -98,6 +104,7 @@ func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context, params dto.TokoFilter)
 			UrlFoto:   toko.UrlFoto,
 		})
 	}
+
 	allTokoResp.Data = tokoResp
 	return allTokoResp, nil
 }
@@ -105,6 +112,7 @@ func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context, params dto.TokoFilter)
 func (t *TokoUseCaseImpl) UpdateMyToko(ctx context.Context, userId uint, idToko uint, data *dto.UpdateProfileTokoReq, file *multipart.FileHeader) (string, *helper.ErrorStruct) {
 	dataToko, err := t.tokoRepository.GetTokoById(ctx, idToko)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By ID")
 		return "", &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errors.New(err.Error()),
@@ -112,25 +120,26 @@ func (t *TokoUseCaseImpl) UpdateMyToko(ctx context.Context, userId uint, idToko 
 	}
 
 	if dataToko.UserID != userId {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Toko and User ID not match")
 		return "", &helper.ErrorStruct{
 			Code: fiber.StatusUnauthorized,
 			Err:  errors.New("unauthorized"),
 		}
 	}
 
-	// Upload file
 	uploadsFolder := "uploads"
 	savePath, err := helper.UploadFile(file, uploadsFolder)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Upload File")
 		return "", &helper.ErrorStruct{
 			Code: fiber.StatusInternalServerError,
 			Err:  err,
 		}
 	}
 
-	// Update database
 	err = t.tokoRepository.UpdateToko(ctx, dataToko.ID, data.NamaToko, savePath)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Toko By ID")
 		return "", &helper.ErrorStruct{
 			Code: fiber.StatusInternalServerError,
 			Err:  err,

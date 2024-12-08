@@ -2,13 +2,11 @@ package controller
 
 import (
 	"fmt"
-	"log"
-	"os"
-	"path/filepath"
 	"strconv"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/usecase"
+	"tugas_akhir_example/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +16,6 @@ type TokoController interface {
 	GetTokoByID(ctx *fiber.Ctx) error
 	GetAllToko(ctx *fiber.Ctx) error
 	UpdateMyToko(ctx *fiber.Ctx) error
-	UpdateMyToko2(ctx *fiber.Ctx) error
 }
 
 type TokoControllerImpl struct {
@@ -37,56 +34,41 @@ func (c *TokoControllerImpl) GetMyToko(ctx *fiber.Ctx) error {
 	
 	id, err := strconv.ParseUint(userId, 10, 32)
 	if err != nil {
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{"Invalid user ID"},
-		})
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse User ID")
+		return helper.BuildResponse(ctx, false, "Invalid user ID", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	toko, err := c.tokoUsc.GetMyToko(ctx.Context(), uint(id))
-	if err != nil {
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{err.Error()},
-		})
+	toko, errorMyToko := c.tokoUsc.GetMyToko(ctx.Context(), uint(id))
+	if errorMyToko != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Toko")
+        return helper.BuildResponse(ctx, false, "Failed to GET data", errorMyToko.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx:        ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       toko,
-	})
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
 func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 
 	id, err := ctx.ParamsInt("id_toko")
 	if err != nil {
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{"Invalid toko ID"},
-		})
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse Toko ID")
+        return helper.BuildResponse(ctx, false, "Invalid Toko ID", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	toko, errUsc := c.tokoUsc.GetTokoByID(ctx.Context(), uint(id))
 	if errUsc != nil {
-		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By ID")
+        return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx:        ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       toko,
-	})
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
 func (c *TokoControllerImpl) GetAllToko(ctx *fiber.Ctx) error {
 
     filter := new(dto.TokoFilter)
     if err := ctx.QueryParser(filter); err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse Request Query")
         return helper.BuildResponse(ctx, false, "Failed to GET data", "Failed to parse request query", nil, fiber.StatusBadRequest)
     }
 
@@ -96,104 +78,37 @@ func (c *TokoControllerImpl) GetAllToko(ctx *fiber.Ctx) error {
         Page:     filter.Page,
     })
 	if err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Toko")
 		return helper.BuildResponse(ctx, false, "Failed to GET data", err.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx:        ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       toko,
-	})
-}
-
-
-	
-
-func ensureUploadsFolderExists() error {
-    // Path folder uploads
-    uploadsFolder := "uploads"
-
-    // Cek apakah folder sudah ada
-    if _, err := os.Stat(uploadsFolder); os.IsNotExist(err) {
-        // Buat folder jika belum ada
-        if err := os.Mkdir(uploadsFolder, os.ModePerm); err != nil {
-            return err
-        }
-    }
-    return nil
-}
-
-func (c *TokoControllerImpl) UpdateMyToko2(ctx *fiber.Ctx) error {
-    file, err := ctx.FormFile("file")
-    if err != nil {
-        return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-            "error": "File is required",
-        })
-    }
-
-    // Pastikan folder uploads ada
-    if err := ensureUploadsFolderExists(); err != nil {
-        log.Printf("Error ensuring uploads folder exists: %v", err)
-        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-            "error": "Failed to prepare uploads folder",
-        })
-    }
-
-    // Mendapatkan path file
-    savePath := filepath.Join("uploads", file.Filename)
-
-    // Simpan file
-    if err := ctx.SaveFile(file, savePath); err != nil {
-        log.Printf("Error saving file: %v", err)
-        return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-            "error": "Failed to save file",
-        })
-    }
-
-    // Respon sukses
-    return ctx.JSON(fiber.Map{
-        "message": "File uploaded successfully",
-        "file": fiber.Map{
-            "name": file.Filename,
-            "path": savePath,
-        },
-    })
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
 func (c *TokoControllerImpl) UpdateMyToko(ctx *fiber.Ctx) error {
     idToko, err := ctx.ParamsInt("id_toko")
     if err != nil {
-        return helper.ResponseWithJSON(&helper.JSONRespArgs{
-            Ctx:        ctx,
-            StatusCode: fiber.StatusBadRequest,
-            Errors:     []string{"Invalid toko ID"},
-        })
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Params Toko ID")
+        return helper.BuildResponse(ctx, false, "Failed to GET data", err.Error(), nil, fiber.StatusBadRequest)
     }
 
     userId := ctx.Locals("userid").(string)
     userIdUint, err := strconv.ParseUint(userId, 10, 32)
     if err != nil {
-        return helper.ResponseWithJSON(&helper.JSONRespArgs{
-            Ctx:        ctx,
-            StatusCode: fiber.StatusBadRequest,
-            Errors:     []string{"Invalid user ID"},
-        })
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse User ID")
+        return helper.BuildResponse(ctx, false, "Invalid user ID", err.Error(), nil, fiber.StatusBadRequest)
     }
 
     input := &dto.UpdateProfileTokoReq{
         NamaToko: ctx.FormValue("nama_toko"),
     }
 
-    // Ambil file dari request
-    file, _ := ctx.FormFile("photo") // File opsional
+    file, _ := ctx.FormFile("photo")
 
     res, errRes := c.tokoUsc.UpdateMyToko(ctx.Context(), uint(userIdUint), uint(idToko), input, file)
     if errRes != nil {
-        return helper.ResponseWithJSON(&helper.JSONRespArgs{
-            Ctx:        ctx,
-            StatusCode: errRes.Code,
-            Errors:     []string{errRes.Err.Error()},
-        })
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update My Toko")
+        return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errRes.Err.Error(), nil, errRes.Code)
     }
 
     return helper.BuildResponse(ctx, true, "Succeed to UPDATE data", nil, res, fiber.StatusOK)

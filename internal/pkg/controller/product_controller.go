@@ -144,10 +144,6 @@ func (c *ProductControllerImpl) DeleteProductByID(ctx *fiber.Ctx) error {
 func (c *ProductControllerImpl) UpdateProductByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id_product")
 	productId := utils.StringToUint(id)
-	// data := new(dto.ProductUpdateReq)
-	// if err := ctx.BodyParser(data); err != nil {
-	// 	return helper.BuildResponse(ctx, false, "Failed to parse request body", err.Error(), nil, fiber.StatusBadRequest)
-	// }
 
 	categoryId := ctx.FormValue("category_id")
 	formatCategory := utils.StringToUint(categoryId)

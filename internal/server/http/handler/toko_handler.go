@@ -15,7 +15,5 @@ func TokoRoute(r fiber.Router, tokoUsc usecase.TokoUseCase) {
 	tokoAPI.Get("", controller.GetAllToko)
 	tokoAPI.Get("my", middleware.MiddlewareAuth, controller.GetMyToko)
 	tokoAPI.Put("/:id_toko", middleware.MiddlewareAuth, controller.UpdateMyToko)
-	// tokoAPI.Put("/:id_toko", middleware.MiddlewareAuth, controller.UpdateMyToko2)
-	tokoAPI.Post("/post-photo", middleware.MiddlewareAuth, controller.UpdateMyToko2)
 	tokoAPI.Get("/:id_toko",middleware.MiddlewareAuth ,controller.GetTokoByID)
 }
