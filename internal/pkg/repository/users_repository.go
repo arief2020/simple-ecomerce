@@ -48,9 +48,6 @@ func (r *UsersRepositoryImpl) GetUserByNoTelp(ctx context.Context, no_telp strin
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By No Telp")
 		return res, err
 	}
-	// if err := r.db.Raw("SELECT * FROM users WHERE no_telp = ? LIMIT 1", no_telp).Scan(&res).Error; err != nil {
-	// 	return res, err
-	// }
 	return res, nil
 }
 
@@ -65,10 +62,6 @@ func (r *UsersRepositoryImpl) CreateUsers(ctx context.Context, data entity.User)
 }
 
 func (r *UsersRepositoryImpl) GetUserById(ctx context.Context, id uint) (res entity.User, err error) {
-	// query := "SELECT * FROM users WHERE id = ? LIMIT 1"
-	// if err := r.db.Raw(query, id).Scan(&res).Error; err != nil {
-	// 	return res, err
-	// }
 
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&res).Error; err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By Id")
@@ -78,12 +71,6 @@ func (r *UsersRepositoryImpl) GetUserById(ctx context.Context, id uint) (res ent
 }
 
 func (r *UsersRepositoryImpl) UpdateUserById(ctx context.Context, id uint, data entity.User) (res string, err error) {
-	// sql := `UPDATE users SET nama = ?, email = ?, no_telp = ?, tanggal_lahir = ?, tentang = ?, pekerjaan = ?, id_provinsi = ?, id_kota = ? WHERE id = ?`
-
-	// if err := r.db.Exec(sql, data.Nama, data.Email, data.NoTelp, data.TanggalLahir, data.Tentang, data.Pekerjaan, data.IdProvinsi, data.IdKota, id).Error; err != nil {
-	// 	return res, err
-	// }
-
 	if err := r.db.Model(&entity.User{}).WithContext(ctx).Where("id = ?", id).Updates(data).Error; err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update User By Id")
 		return res, err
@@ -131,11 +118,6 @@ func (r *UsersRepositoryImpl) GetMyAlamatById(ctx context.Context, id uint, idAl
 }
 
 func (r *UsersRepositoryImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAlamat uint, data entity.Alamat) (res string, err error) {
-	// query := "UPDATE alamats SET judul_alamat = ?, nama_penerima = ?, no_telp = ?, detail_alamat = ? WHERE id_user = ? AND id = ?"
-	// if err := r.db.Exec(query, data.JudulAlamat, data.NamaPenerima, data.NoTelp, data.DetailAlamat, id, idAlamat).Error; err != nil {
-	// 	return res, err
-	// }
-
 	if err := r.db.Model(&entity.Alamat{}).WithContext(ctx).Where("id_user = ? AND id = ?", id, idAlamat).Updates(data).Error; err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update My Alamat By Id")
 		return res, err
@@ -144,11 +126,6 @@ func (r *UsersRepositoryImpl) UpdateMyAlamatById(ctx context.Context, id uint, i
 }
 
 func (r *UsersRepositoryImpl) DeleteMyAlamatById(ctx context.Context, id uint, idAlamat uint) (res string, err error) {
-	// query := "DELETE FROM alamats WHERE id_user = ? AND id = ?"
-	// if err := r.db.Exec(query, id, idAlamat).Error; err != nil {
-	// 	return res, err
-	// }
-
 	if err := r.db.WithContext(ctx).Where("id_user = ? AND id = ?", id, idAlamat).Delete(&entity.Alamat{}).Error; err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Delete My Alamat By Id")
 		return res, err
