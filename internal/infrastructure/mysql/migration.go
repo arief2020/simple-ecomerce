@@ -16,9 +16,9 @@ func RunMigration(mysqlDB *gorm.DB) {
 		&entity.Toko{},
 		&entity.Category{},
 		&entity.Product{},
-		&entity.FotoProduct{},
 		&entity.Trx{},
 		&entity.LogProduct{},
+		&entity.FotoProduct{},
 		&entity.DetailTrx{},
 	)
 	if err != nil {

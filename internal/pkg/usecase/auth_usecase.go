@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/entity"
 	userdto "tugas_akhir_example/internal/pkg/dto"
@@ -38,19 +37,15 @@ func NewAuthUseCase(userrepository repository.UsersRepository, provinceCityRepos
 func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (res userdto.LoginRes, err *helper.ErrorStruct) {
 	resRepo, errRepo := alc.userrepository.GetUserByNoTelp(ctx, params.NoTelp)
 	if errors.Is(errRepo, gorm.ErrRecordNotFound) {
-		fmt.Println("debug 1")
-		fmt.Println(errRepo)
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found: Get User By NoTelp")
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
 			Err:  errors.New("no telp atau kata sandi salah"),
 		}
 	}
 
-	fmt.Println("debug 1 success")
-
 	if errRepo != nil {
-		// helper.Logger(helper.LoggerLevelError, fmt.Sprintf("Error at GetAllUsers : %s", errRepo.Error()), errRepo)
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at GetAllUsers : %s", errRepo.Error()))
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Get User By NoTelp : %s", errRepo.Error()))
 		fmt.Println("debug 2")
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
@@ -58,11 +53,10 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 		}
 	}
 
-	fmt.Println("debug 2 success")
 
 	isValid := utils.CheckPasswordHash(params.KataSandi, resRepo.KataSandi)
 	if !isValid {
-		fmt.Println("debug 3")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Invalid Password")
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusUnauthorized,
 			Err:  errors.New("no telp atau kata sandi salah"),
@@ -71,6 +65,7 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 
 	dataProvince, errRepo := alc.provinceCityRepository.GetProvinceByID(ctx, resRepo.IdProvinsi)
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Get Province By ID : %s", errRepo.Error()))
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errRepo,
@@ -79,13 +74,12 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 
 	dataCity, errRepo := alc.provinceCityRepository.GetCityByID(ctx, resRepo.IdKota)
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Get City By ID : %s", errRepo.Error()))
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errRepo,
 		}
 	}
-
-	fmt.Println("debug 3 success")
 
 	tokenInit := utils.NewToken(utils.DataClaims{
 		ID:    fmt.Sprint(resRepo.ID),
@@ -95,26 +89,12 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 
 	token, errToken := tokenInit.Create()
 	if errToken != nil {
-		fmt.Println("debug 4")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Create Token : %s", errToken.Error()))
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusUnauthorized,
 			Err:  errToken,
 		}
 	}
-
-	// layout := "02/01/2006" // Define the layout you expect the date to be in
-	// tanggalLahirParsed, errParse := time.Parse(resRepo.TanggalLahir, layout)
-	// if errParse != nil {
-	// 	log.Println("Error parsing date:", errParse)
-	// 	err = &helper.ErrorStruct{
-	// 		Code: fiber.StatusBadRequest,
-	// 		Err:  errParse,
-	// 	}
-	// 	return
-	// }
-
-	fmt.Println("debug 4 success")
-
 	tanggalLahirFormatted := resRepo.TanggalLahir.Format("02/01/2006")
 
 	res = userdto.LoginRes{
@@ -133,7 +113,7 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 }
 func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.CreateUser) (res uint, err *helper.ErrorStruct) {
 	if errValidate := helper.Validate.Struct(params); errValidate != nil {
-		log.Println(errValidate)
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Validate : %s", errValidate.Error()))
 		return res, &helper.ErrorStruct{
 			Err:  errValidate,
 			Code: fiber.StatusBadRequest,
@@ -142,6 +122,7 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 
 	resCityByProvRepo, _ := alc.provinceCityRepository.GetAllCitiesByProvinceID(ctx, params.IdProvinsi)
 	if resCityByProvRepo == nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found: Get City By Province ID")
 		return res, &helper.ErrorStruct{
 			Err:  errors.New("data kota tidak ditemukan"),
 			Code: fiber.StatusNotFound,
@@ -150,47 +131,32 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 
 	isCityExist := utils.IsIDExist(resCityByProvRepo, params.IdKota)
 	if !isCityExist {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found: Get City By Province ID")
 		return res, &helper.ErrorStruct{
 			Err:  errors.New("data kota tidak ditemukan"),
 			Code: fiber.StatusNotFound,
 		}
 	}
 
-	// resProvRepo, _ := alc.provinceCityRepository.GetProvinceByID(ctx, params.IdProvinsi)
-	// if resProvRepo == nil {
-	// 	return res, &helper.ErrorStruct{
-	// 		Err:  errors.New("Data Provinsi Tidak Ditemukan"),
-	// 		Code: fiber.StatusNotFound,
-	// 	}
-	// }
-
-	// resKotaRepo, _ := alc.provinceCityRepository.GetCityByID(ctx, params.IdKota)
-	// if resKotaRepo == nil {
-	// 	return res, &helper.ErrorStruct{
-	// 		Err:  errors.New("Data Kota Tidak Ditemukan"),
-	// 		Code: fiber.StatusNotFound,
-	// 	}
-	// }
 	hashPass, errHash := utils.HashPassword(params.KataSandi)
 	if errHash != nil {
-		log.Println(errHash)
-		err = &helper.ErrorStruct{
-			Code: fiber.StatusInternalServerError,
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Hash Password : %s", errHash.Error()))
+		
+		return res, &helper.ErrorStruct{
+			Code: fiber.StatusBadRequest,
 			Err:  errHash,
 		}
-		return
 	}
 
 	TanggalLahirParse, errParse := utils.ParseDate(params.TanggalLahir)
 	if errParse != nil {
-		log.Println(err)
-		err = &helper.ErrorStruct{
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Parse Date : %s", errParse.Error()))
+		
+		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errParse,
 		}
-		return
 	}
-
 
 
 	resRepo, errRepo := alc.userrepository.CreateUsers(ctx, entity.User{
@@ -206,7 +172,6 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 	})
 	
 	if errRepo != nil {
-		// helper.Logger(helper.LoggerLevelError, fmt.Sprintf("Error at CreateUsers : %s", errRepo.Error()), errRepo)
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at CreateUsers : %s", errRepo.Error()))
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
@@ -214,22 +179,18 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 		}
 	}
 
-
 	_, errRepoToko := alc.tokoRepository.CreateToko(ctx, entity.Toko{
 		NamaToko: nil,
 		UrlFoto:  nil,
 		UserID:   resRepo.ID,
 	})
 	if errRepoToko != nil {
-		// helper.Logger(helper.LoggerLevelError, fmt.Sprintf("Error at CreateToko : %s", errRepo.Error()), errRepo)
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at CreateToko : %s", errRepo))
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errRepo,
 		}
 	}
-
-
 
 	return resRepo.ID, nil
 }

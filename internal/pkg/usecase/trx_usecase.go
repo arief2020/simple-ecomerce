@@ -41,6 +41,7 @@ func NewTrxUseCase(trxRepo repository.TrxRepository, userRepo repository.UsersRe
 func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint) (int, *helper.ErrorStruct) {
 	_, err := t.userRepo.GetUserById(ctx, userId)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, fmt.Sprintf("Error when get user by id : %s", err.Error()))
 		return 0, &helper.ErrorStruct{
 			Err: err,
 			Code: fiber.StatusBadRequest,
@@ -134,44 +135,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 	return int(resRepoTrx.ID), nil
 }
 
-// func (t *TrxUseCaseImpl) GetAllTransctionByUserID(ctx context.Context, userId uint) ([]entity.Trx, *helper.ErrorStruct) {
-// 	resRepoTrx, errRepoTrx := t.trxRepo.GetAllTrxByUserID(ctx, userId)
-// 	if errRepoTrx != nil {
-// 		return nil, &helper.ErrorStruct{
-// 			Err: errRepoTrx,
-// 			Code: fiber.StatusBadRequest,
-// 		}
-// 	}
-// 	return resRepoTrx, nil
-// }
-
-// func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, userId uint) (*dto.TransactionResponse, *helper.ErrorStruct) {
-// 	resRepoTrx, errRepoTrx := t.trxRepo.GetTrxByID(ctx, trxId, userId)
-// 	if errRepoTrx != nil {
-// 		return nil, &helper.ErrorStruct{
-// 			Err: errors.New("no data trx"),
-// 			Code: fiber.StatusBadRequest,
-// 		}
-// 	}
-// 	dataResp := &dto.TransactionResponse{
-// 		ID: int(resRepoTrx.ID),
-// 		HargaTotal: resRepoTrx.HargaTotal,
-// 		KodeInvoice: resRepoTrx.KodeInvoice,
-// 		MethodBayar: resRepoTrx.MethodBayar,
-// 		AlamatKirim: dto.AlamatResp{
-// 			Id: resRepoTrx.AlamatID,
-// 			JudulAlamat: resRepoTrx.Alamat.JudulAlamat,
-// 			NamaPenerima: resRepoTrx.Alamat.NamaPenerima,
-// 			NoTelp: resRepoTrx.Alamat.NoTelp,
-// 			DetailAlamat: resRepoTrx.Alamat.DetailAlamat,
-// 		},
-// 		DetailTrx: nil,
-// 	}
-// 	return dataResp, nil
-// }
-
 func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, userId uint) (*dto.TransactionResponse, *helper.ErrorStruct) {
-	// Ambil data transaksi dari repository
 	resRepoTrx, errRepoTrx := t.trxRepo.GetTrxByID(ctx, trxId, userId)
 	if errRepoTrx != nil {
 		if errors.Is(errRepoTrx, gorm.ErrRecordNotFound) {
@@ -186,7 +150,6 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 		}
 	}
 
-	// Bangun detail transaksi
 	var detailTrx []dto.DetailTrx
 	for _, detail := range resRepoTrx.DetailTrx {
 		detailTrx = append(detailTrx, dto.DetailTrx{
@@ -218,7 +181,6 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 		})
 	}
 
-	// Bangun response transaksi
 	dataResp := &dto.TransactionResponse{
 		ID:          int(resRepoTrx.ID),
 		HargaTotal:  resRepoTrx.HargaTotal,
@@ -239,7 +201,6 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 
 
 func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTransactionReq, userId uint) (*dto.AllTransactionResponse, *helper.ErrorStruct) {
-	// Default pagination
 	if req.Limit < 1 {
 		req.Limit = 10
 	}
@@ -247,7 +208,6 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 		req.Page = 1
 	}
 
-	// Ambil data dari repository
 	transactions, _, err := t.trxRepo.GetAllTransaction(ctx, req, userId)
 	if err != nil {
 		return nil, &helper.ErrorStruct{
@@ -256,7 +216,6 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 		}
 	}
 
-	// Bangun respons transaksi
 	var transactionResponses []dto.TransactionResponse
 	for _, trx := range transactions {
 		// Detail transaksi
@@ -291,7 +250,6 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 			})
 		}
 
-		// Respons transaksi
 		transactionResponses = append(transactionResponses, dto.TransactionResponse{
 			ID:          int(trx.ID),
 			HargaTotal:  trx.HargaTotal,
@@ -308,7 +266,6 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 		})
 	}
 
-	// Bangun respons utama
 	response := &dto.AllTransactionResponse{
 		Data:  transactionResponses,
 		Page:  req.Page,
@@ -318,7 +275,6 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 	return response, nil
 }
 
-// Helper untuk memetakan foto produk
 func mapPhotos(photos []entity.FotoProduct) []dto.PhotoProductResp {
 	var photoResps []dto.PhotoProductResp
 	for _, photo := range photos {

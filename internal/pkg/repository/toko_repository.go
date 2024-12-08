@@ -68,8 +68,13 @@ func (r *TokoRepositoryImpl) GetAllToko(ctx context.Context, params dto.TokoFilt
 
 
 func (r *TokoRepositoryImpl) UpdateToko(ctx context.Context, id uint, nama_toko string, url_foto string) error {
-	query := "UPDATE tokos SET nama_toko = ?, url_foto = ? WHERE id_user = ?"
-	if err := r.db.Exec(query, nama_toko, url_foto, id).Error; err != nil {
+	var toko entity.Toko
+	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&toko).Error; err != nil {
+		return err
+	}
+	toko.NamaToko = &nama_toko
+	toko.UrlFoto = &url_foto
+	if err := r.db.WithContext(ctx).Save(&toko).Error; err != nil {
 		return err
 	}
 	return nil

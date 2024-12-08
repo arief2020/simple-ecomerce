@@ -166,64 +166,16 @@ func (uc *UserUseCaseImpl) GetMyAlamat(ctx context.Context, id uint, params dto.
 	return resp, nil
 }
 
-// func (uc *UserUseCaseImpl) CreateMyNewAlamat(ctx context.Context, id uint, params dto.InserAlamatReq) (*dto.AlamatResp, *helper.ErrorStruct) {
-// 	// Panggil repository untuk mendapatkan data user
-// 	user, err := uc.userrepository.GetUserById(ctx, id)
-// 	if err != nil {
-// 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at CreateMyNewAlamat")
-// 		return nil, &helper.ErrorStruct{
-// 			Code: fiber.StatusNotFound,
-// 			Err:  errors.New("user not found"),
-// 		}
-// 	}
-// 	dataReq := dto.InserAlamatReq{
-// 		UserId:       user.ID,
-// 		JudulAlamat:  params.JudulAlamat,
-// 		NamaPenerima: params.NamaPenerima,
-// 		NoTelp:       params.NoTelp,
-// 		DetailAlamat: params.DetailAlamat,
-// 	}
-
-// 	alamat, errRepo := uc.userrepository.InsertAlamat(ctx, dataReq)
-// 	if errRepo != nil {
-// 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at CreateMyNewAlamat")
-// 		return nil, &helper.ErrorStruct{
-// 			Err:  errRepo,
-// 			Code: fiber.StatusBadRequest,
-// 		}
-// 	}
-// 	// alamat, errRepo := uc.userrepository.InsertAlamat(ctx, user.ID, dataReq)
-// 	// if errRepo != nil {
-// 	// 	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at CreateMyNewAlamat")
-// 	// 	return nil, &helper.ErrorStruct{
-// 	// 		Err:  errRepo,
-// 	// 		Code: fiber.StatusBadRequest,
-// 	// 	}
-// 	// }
-
-// 	resp := &dto.AlamatResp{
-// 		JudulAlamat:  alamat.JudulAlamat,
-// 		NamaPenerima: alamat.NamaPenerima,
-// 		NoTelp:       alamat.NoTelp,
-// 		DetailAlamat: alamat.DetailAlamat,
-// 	}
-
-// 	return resp, nil
-// }
-
-
 func (uc *UserUseCaseImpl) CreateMyNewAlamat(ctx context.Context, id uint, params dto.InserAlamatReq) (int, *helper.ErrorStruct) {
-	// Panggil repository untuk mendapatkan data user
 	user, err := uc.userrepository.GetUserById(ctx, id)
 	if err != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at CreateMyNewAlamat")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By Id")
 		return 0, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
 			Err:  errors.New("user not found"),
 		}
 	}
 
-	// Konversi data request menjadi entity
 	dataEntity := entity.Alamat{
 		JudulAlamat:  params.JudulAlamat,
 		NamaPenerima: params.NamaPenerima,
@@ -232,30 +184,19 @@ func (uc *UserUseCaseImpl) CreateMyNewAlamat(ctx context.Context, id uint, param
 		UserID:       user.ID,
 	}
 
-	// Insert data alamat ke database
 	alamat, errRepo := uc.userrepository.InsertAlamat(ctx, dataEntity)
 	if errRepo != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at CreateMyNewAlamat")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at Create New Alamat")
 		return 0, &helper.ErrorStruct{
 			Err:  errRepo,
 			Code: fiber.StatusBadRequest,
 		}
 	}
 
-	// Konversi hasil insert ke response DTO
-	// resp := &dto.AlamatResp{
-	// 	Id:           alamat.ID,
-	// 	JudulAlamat:  alamat.JudulAlamat,
-	// 	NamaPenerima: alamat.NamaPenerima,
-	// 	NoTelp:       alamat.NoTelp,
-	// 	DetailAlamat: alamat.DetailAlamat,
-	// }
-
 	return int(alamat.ID), nil
 }
 
 func (uc *UserUseCaseImpl) GetMyAlamatById(ctx context.Context, id uint, idAlamat uint) (*dto.AlamatResp, *helper.ErrorStruct) {
-	// Panggil repository untuk mendapatkan data user
 	user, err := uc.userrepository.GetUserById(ctx, id)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at GetMyAlamatByID")
@@ -269,20 +210,20 @@ func (uc *UserUseCaseImpl) GetMyAlamatById(ctx context.Context, id uint, idAlama
 	alamat, errRepo := uc.userrepository.GetMyAlamatById(ctx, user.ID, idAlamat)
 	if errRepo != nil {
 		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Alamat If Not Found")
 			return nil, &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("alamat not found"),
 
 		}
-			
-		}
+	}
+	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at GetMyAlamatByID")
 		return nil, &helper.ErrorStruct{
 			Err:  errRepo,
 			Code: fiber.StatusBadRequest,
 		}
 	}
 
-	// Konversi hasil query ke response DTO
 	resp := &dto.AlamatResp{
 		Id:           alamat.ID,
 		JudulAlamat:  alamat.JudulAlamat,
@@ -295,20 +236,20 @@ func (uc *UserUseCaseImpl) GetMyAlamatById(ctx context.Context, id uint, idAlama
 }
 
 func (uc *UserUseCaseImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAlamat uint, params dto.UpdateAlamatReq) (string, *helper.ErrorStruct) {
-	// Panggil repository untuk mendapatkan data user
 	user, err := uc.userrepository.GetUserById(ctx, id)
 	if err != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at UpdateMyAlamatByID")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By Id")
 		return "", &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
 			Err:  errors.New("user not found"),
 		}
 	}
 
-	// Panggil repository untuk mendapatkan data alamat
 	alamat, errRepo := uc.userrepository.GetMyAlamatById(ctx, user.ID, idAlamat)
 	if errRepo != nil {
+
 		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Alamat")
 			return "", &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("record not found"),
@@ -316,14 +257,13 @@ func (uc *UserUseCaseImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAl
 		}
 			
 		}
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at UpdateMyAlamatByID")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Alamat By Id")
 		return "", &helper.ErrorStruct{
 			Err:  errRepo,
 			Code: fiber.StatusBadRequest,
 		}
 	}
 
-	// Konversi data request menjadi entity
 	dataEntity := entity.Alamat{
 		JudulAlamat:  alamat.JudulAlamat,
 		NamaPenerima: params.NamaPenerima,
@@ -332,7 +272,6 @@ func (uc *UserUseCaseImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAl
 		UserID:       user.ID,
 	}
 
-	// Update data alamat ke database
 	_, errRepo = uc.userrepository.UpdateMyAlamatById(ctx, user.ID, idAlamat, dataEntity)
 	if errRepo != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at UpdateMyAlamatByID")
@@ -346,10 +285,8 @@ func (uc *UserUseCaseImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAl
 }
 
 func (uc *UserUseCaseImpl) DeleteMyAlamatById(ctx context.Context, id uint, idAlamat uint) (string, *helper.ErrorStruct) {
-	// Panggil repository untuk mendapatkan data user
 	user, err := uc.userrepository.GetUserById(ctx, id)
 	if err != nil {
-		
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at DeleteMyAlamatByID")
 		return "", &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
@@ -361,6 +298,7 @@ func (uc *UserUseCaseImpl) DeleteMyAlamatById(ctx context.Context, id uint, idAl
 	_, errRepo := uc.userrepository.GetMyAlamatById(ctx, user.ID, idAlamat)
 	if errRepo != nil {
 		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Alamat")
 			return "", &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("record not found"),

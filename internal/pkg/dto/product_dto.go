@@ -24,6 +24,14 @@ type ProductCreateReq struct {
 	Stok         string `json:"stok" validate:"required"`
 	Deskripsi    string `json:"deskripsi" validate:"required"`
 }
+type EvaluasiProductCreateReq struct {
+	NamaProduk   string `form:"nama_produk" validate:"required"`
+	CategoryID   uint   `form:"id_category" validate:"required"`
+	HargaReseller string `form:"harga_reseller" validate:"required"`
+	HargaKonsumen string `form:"harga_konsumen" validate:"required"`
+	Stok         string `form:"stok" validate:"required"`
+	Deskripsi    string `form:"deskripsi" validate:"required"`
+}
 
 type ProductUpdateReq struct {
 	NamaProduk   string `json:"nama_produk" validate:"required"`

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -32,6 +33,7 @@ func NewTokoController(tokoUsc usecase.TokoUseCase) TokoController {
 func (c *TokoControllerImpl) GetMyToko(ctx *fiber.Ctx) error {
 
 	userId := ctx.Locals("userid").(string)
+    fmt.Println(userId)
 	
 	id, err := strconv.ParseUint(userId, 10, 32)
 	if err != nil {

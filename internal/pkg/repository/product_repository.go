@@ -116,17 +116,17 @@ func (r *ProductRepositoryImpl) GetAllProduct(ctx context.Context, params dto.Al
 
     // Filter berdasarkan nama produk
     if params.NamaProduk != "" {
-        query = query.Where("nama_produk ILIKE ?", "%"+params.NamaProduk+"%")
+        query = query.Where("nama_produk LIKE ?", "%"+params.NamaProduk+"%")
     }
 
     // Filter berdasarkan kategori
     if params.CategoryID != 0 {
-        query = query.Where("category_id = ?", params.CategoryID)
+        query = query.Where("id_category = ?", params.CategoryID)
     }
 
     // Filter berdasarkan toko
     if params.TokoID != 0 {
-        query = query.Where("toko_id = ?", params.TokoID)
+        query = query.Where("id_toko = ?", params.TokoID)
     }
 
     // Filter berdasarkan harga (min dan max)

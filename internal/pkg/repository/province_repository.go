@@ -17,7 +17,6 @@ const provinceCityDetailCityAPI = "https://emsifa.github.io/api-wilayah-indonesi
 
 type ProvinceCityRepository interface {
 	// ListProvincies(ctx context.Context) (res dto.ListProvResp, err error)
-	// referensi orang
 	GetAllProvinces(ctx context.Context, limit, offset int, search string) (res []*dto.ProvinceResp, err error)
 	GetAllCitiesByProvinceID(ctx context.Context, provinceid string) (res []*dto.CityResp, err error)
 	GetProvinceByID(ctx context.Context, provinceid string) (res *dto.ProvinceResp, err error)

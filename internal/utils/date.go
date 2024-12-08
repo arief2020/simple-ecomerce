@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-// @TODO : make function parsing date
-
 func FormatDate(date time.Time) string {
 	dateFormated := date.Format("02/01/2006")
 	return dateFormated

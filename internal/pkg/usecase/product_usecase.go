@@ -42,8 +42,6 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
 	}
 
-	
-
 	dataToko, err := u.tokoRepo.GetTokoByUserId(ctx, userId)
 	if err != nil {
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
@@ -87,6 +85,7 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 			UrlFoto: photo,
 			ProductID: resCreateRepo.ID,
 		}
+		// saran pakai insert many
 		_, errRepoPhoto := u.productRepo.CreatePhotoProduct(ctx, data)
 		if errRepoPhoto != nil {
 			return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepoPhoto.Error())}
@@ -176,6 +175,7 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 }
 
 func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, productReq dto.ProductUpdateReq) (string, *helper.ErrorStruct) {
+	// tambahkan kondisi harus product di toko sendiri
 	_, errRepo := u.productRepo.GetProductByID(ctx, id)
 	if errRepo != nil {
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
@@ -202,6 +202,8 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 }
 
 func (u *ProductUseCaseImpl) DeleteProductByID(ctx context.Context, productId uint) (string, *helper.ErrorStruct) {
+	
+	// tambahkan kondisi harus product di toko sendiri
 	_, errRepo := u.productRepo.GetProductByID(ctx, productId)
 	if errRepo != nil {
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
