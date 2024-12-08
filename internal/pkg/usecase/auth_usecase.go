@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"tugas_akhir_example/internal/helper"
-	"tugas_akhir_example/internal/pkg/entity"
 	userdto "tugas_akhir_example/internal/pkg/dto"
+	"tugas_akhir_example/internal/pkg/entity"
 	"tugas_akhir_example/internal/pkg/repository"
 	"tugas_akhir_example/internal/utils"
 
@@ -20,16 +20,16 @@ type AuthsUseCase interface {
 }
 
 type AuthUseCaseImpl struct {
-	userrepository repository.UsersRepository
+	userrepository         repository.UsersRepository
 	provinceCityRepository repository.ProvinceCityRepository
-	tokoRepository repository.TokoRepository
+	tokoRepository         repository.TokoRepository
 }
 
 func NewAuthUseCase(userrepository repository.UsersRepository, provinceCityRepository repository.ProvinceCityRepository, tokoRepository repository.TokoRepository) AuthsUseCase {
 	return &AuthUseCaseImpl{
-		userrepository: userrepository,
+		userrepository:         userrepository,
 		provinceCityRepository: provinceCityRepository,
-		tokoRepository: tokoRepository,
+		tokoRepository:         tokoRepository,
 	}
 
 }
@@ -52,7 +52,6 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 			Err:  errRepo,
 		}
 	}
-
 
 	isValid := utils.CheckPasswordHash(params.KataSandi, resRepo.KataSandi)
 	if !isValid {
@@ -82,8 +81,8 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 	}
 
 	tokenInit := utils.NewToken(utils.DataClaims{
-		ID:    fmt.Sprint(resRepo.ID),
-		Email: resRepo.Email,
+		ID:      fmt.Sprint(resRepo.ID),
+		Email:   resRepo.Email,
 		IsAdmin: resRepo.IsAdmin,
 	})
 
@@ -98,15 +97,15 @@ func (alc *AuthUseCaseImpl) Login(ctx context.Context, params userdto.Login) (re
 	tanggalLahirFormatted := resRepo.TanggalLahir.Format("02/01/2006")
 
 	res = userdto.LoginRes{
-		Email: resRepo.Email,
-		Nama:  resRepo.Nama,
-		NoTelp: resRepo.NoTelp,
+		Email:        resRepo.Email,
+		Nama:         resRepo.Nama,
+		NoTelp:       resRepo.NoTelp,
 		TanggalLahir: tanggalLahirFormatted,
-		Tentang: resRepo.Tentang,
-		Pekerjaan: resRepo.Pekerjaan,
-		IdProvinsi: dataProvince,
-		IdKota: dataCity,
-		Token: token,
+		Tentang:      resRepo.Tentang,
+		Pekerjaan:    resRepo.Pekerjaan,
+		IdProvinsi:   dataProvince,
+		IdKota:       dataCity,
+		Token:        token,
 	}
 
 	return res, nil
@@ -141,7 +140,7 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 	hashPass, errHash := utils.HashPassword(params.KataSandi)
 	if errHash != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Hash Password : %s", errHash.Error()))
-		
+
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errHash,
@@ -151,26 +150,25 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 	TanggalLahirParse, errParse := utils.ParseDate(params.TanggalLahir)
 	if errParse != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Parse Date : %s", errParse.Error()))
-		
+
 		return res, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
 			Err:  errParse,
 		}
 	}
 
-
 	resRepo, errRepo := alc.userrepository.CreateUsers(ctx, entity.User{
-		Email:    params.Email,
-		Nama:     params.Name,
-		KataSandi: hashPass,
+		Email:        params.Email,
+		Nama:         params.Name,
+		KataSandi:    hashPass,
 		TanggalLahir: TanggalLahirParse,
 		NoTelp:       params.NoTelp,
 		JenisKelamin: params.JenisKelamin,
-		Pekerjaan:   params.Pekerjaan,
-		IdProvinsi:  params.IdProvinsi,
-		IdKota:      params.IdKota,
+		Pekerjaan:    params.Pekerjaan,
+		IdProvinsi:   params.IdProvinsi,
+		IdKota:       params.IdKota,
 	})
-	
+
 	if errRepo != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at CreateUsers : %s", errRepo.Error()))
 		return res, &helper.ErrorStruct{

@@ -26,7 +26,6 @@ type CategoryUseCaseImpl struct {
 	categoryRepository repository.CategoryRepository
 }
 
-
 func NewCategoryUseCase(categoryRepository repository.CategoryRepository) CategoryUseCase {
 	return &CategoryUseCaseImpl{
 		categoryRepository: categoryRepository,
@@ -37,7 +36,7 @@ func (c *CategoryUseCaseImpl) GetAllCategory(ctx context.Context) ([]*dto.Catego
 	categories, err := c.categoryRepository.GetAllCategory(ctx)
 	if err != nil {
 		return nil, &helper.ErrorStruct{
-			Err: err,
+			Err:  err,
 			Code: fiber.StatusInternalServerError,
 		}
 	}
@@ -45,7 +44,7 @@ func (c *CategoryUseCaseImpl) GetAllCategory(ctx context.Context) ([]*dto.Catego
 	var categoriesResp []*dto.CategoryResp
 	for _, category := range categories {
 		categoriesResp = append(categoriesResp, &dto.CategoryResp{
-			ID:          category.ID,
+			ID:           category.ID,
 			NamaCategory: category.NamaCategory,
 		})
 	}
@@ -58,27 +57,26 @@ func (c *CategoryUseCaseImpl) GetCategoryByID(ctx context.Context, id uint) (*dt
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Get Category")
-		return nil, &helper.ErrorStruct{
-			Code: fiber.StatusNotFound,
-			Err:  errors.New("no data category"),
-	}
-}
-helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Get Category")
+			return nil, &helper.ErrorStruct{
+				Code: fiber.StatusNotFound,
+				Err:  errors.New("no data category"),
+			}
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Get Category")
 		return nil, &helper.ErrorStruct{
 			Err: err,
 		}
 	}
 
-
 	return &dto.CategoryResp{
-		ID:          category.ID,
+		ID:           category.ID,
 		NamaCategory: category.NamaCategory,
 	}, nil
 }
 
 func (c *CategoryUseCaseImpl) CreateCategory(ctx context.Context, data dto.CategoryReq) (*dto.CategoryResp, *helper.ErrorStruct) {
 	dataReq := entity.Category{
-		NamaCategory: data.NamaCategory,	
+		NamaCategory: data.NamaCategory,
 	}
 	category, err := c.categoryRepository.CreateCategory(ctx, dataReq)
 	if err != nil {
@@ -89,14 +87,14 @@ func (c *CategoryUseCaseImpl) CreateCategory(ctx context.Context, data dto.Categ
 	}
 
 	return &dto.CategoryResp{
-		ID:          category.ID,
+		ID:           category.ID,
 		NamaCategory: category.NamaCategory,
 	}, nil
 }
 
 func (c *CategoryUseCaseImpl) UpdateCategoryByID(ctx context.Context, id uint, data dto.CategoryReq) (*dto.CategoryResp, *helper.ErrorStruct) {
 	dataReq := entity.Category{
-		NamaCategory: data.NamaCategory,	
+		NamaCategory: data.NamaCategory,
 	}
 	category, err := c.categoryRepository.UpdateCategoryByID(ctx, id, dataReq)
 	if err != nil {
@@ -107,7 +105,7 @@ func (c *CategoryUseCaseImpl) UpdateCategoryByID(ctx context.Context, id uint, d
 	}
 
 	return &dto.CategoryResp{
-		ID:          category.ID,
+		ID:           category.ID,
 		NamaCategory: category.NamaCategory,
 	}, nil
 }

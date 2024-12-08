@@ -24,19 +24,19 @@ type ProductUseCase interface {
 
 type ProductUseCaseImpl struct {
 	productRepo repository.ProductRepository
-	tokoRepo repository.TokoRepository
-	userRepo repository.UsersRepository
+	tokoRepo    repository.TokoRepository
+	userRepo    repository.UsersRepository
 }
 
 func NewProductUseCase(productRepo repository.ProductRepository, tokoRepo repository.TokoRepository, userRepo repository.UsersRepository) ProductUseCase {
 	return &ProductUseCaseImpl{
 		productRepo: productRepo,
-		tokoRepo: tokoRepo,
-		userRepo: userRepo,
+		tokoRepo:    tokoRepo,
+		userRepo:    userRepo,
 	}
 }
 
-func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.ProductCreateReq,photos []*multipart.FileHeader, userId uint) (int, *helper.ErrorStruct) {
+func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.ProductCreateReq, photos []*multipart.FileHeader, userId uint) (int, *helper.ErrorStruct) {
 	_, err := u.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By ID")
@@ -51,14 +51,14 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 
 	slug := utils.CreateSlug(productReq.NamaProduk)
 	dataReq := entity.Product{
-		NamaProduk: productReq.NamaProduk,
-		CategoryID:  productReq.CategoryID,
+		NamaProduk:    productReq.NamaProduk,
+		CategoryID:    productReq.CategoryID,
 		HargaReseller: productReq.HargaReseller,
 		HargaKonsumen: productReq.HargaKonsumen,
-		Stok: productReq.Stok,
-		Deskripsi: productReq.Deskripsi,
-		TokoID: dataToko.ID,
-		Slug: slug,
+		Stok:          productReq.Stok,
+		Deskripsi:     productReq.Deskripsi,
+		TokoID:        dataToko.ID,
+		Slug:          slug,
 	}
 
 	pathUploadedPhotos := []string{}
@@ -79,7 +79,7 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 
 	for _, photo := range pathUploadedPhotos {
 		data := entity.FotoProduct{
-			UrlFoto: photo,
+			UrlFoto:   photo,
 			ProductID: resCreateRepo.ID,
 		}
 		_, errRepoPhoto := u.productRepo.CreatePhotoProduct(ctx, data)
@@ -88,7 +88,6 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 			return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepoPhoto.Error())}
 		}
 	}
-
 
 	return int(resCreateRepo.ID), nil
 }
@@ -105,13 +104,13 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllPr
 	}
 
 	resRepo, errRepo := u.productRepo.GetAllProduct(ctx, dto.AllProductFilter{
-		Limit:  params.Limit,
-		Page: params.Page,
-		NamaProduk:  params.NamaProduk,
-		CategoryID:  params.CategoryID,
-		TokoID:  params.TokoID,
-		MaxHarga:  params.MinHarga,
-		MinHarga:  params.MinHarga,
+		Limit:      params.Limit,
+		Page:       params.Page,
+		NamaProduk: params.NamaProduk,
+		CategoryID: params.CategoryID,
+		TokoID:     params.TokoID,
+		MaxHarga:   params.MinHarga,
+		MinHarga:   params.MinHarga,
 	})
 	if errRepo != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Product")
@@ -121,22 +120,22 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllPr
 	data := []dto.ProductResp{}
 	for _, product := range resRepo {
 		data = append(data, dto.ProductResp{
-			ID:             product.ID,
-			NamaProduk:     product.NamaProduk,
-			Slug:           product.Slug,
-			HargaReseller:  product.HargaReseller,
-			HargaKonsumen:  product.HargaKonsumen,
-			Stok:           product.Stok,
-			Deskripsi:      product.Deskripsi,
-			Toko:           product.Toko,
-			Category:       product.Category,
-			Photos:         product.Photos,
+			ID:            product.ID,
+			NamaProduk:    product.NamaProduk,
+			Slug:          product.Slug,
+			HargaReseller: product.HargaReseller,
+			HargaKonsumen: product.HargaKonsumen,
+			Stok:          product.Stok,
+			Deskripsi:     product.Deskripsi,
+			Toko:          product.Toko,
+			Category:      product.Category,
+			Photos:        product.Photos,
 		})
 	}
 
 	resp := &dto.AllProductResp{
-		Data: data,
-		Page: params.Page/params.Limit + 1,
+		Data:  data,
+		Page:  params.Page/params.Limit + 1,
 		Limit: params.Limit,
 	}
 
@@ -155,16 +154,16 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 	}
 
 	data := dto.ProductResp{
-		ID:             resRepo.ID,
-		NamaProduk:     resRepo.NamaProduk,
-		Slug:           resRepo.Slug,
-		HargaReseller:  resRepo.HargaReseller,
-		HargaKonsumen:  resRepo.HargaKonsumen,
-		Stok:           resRepo.Stok,
-		Deskripsi:      resRepo.Deskripsi,
-		Toko:           resRepo.Toko,
-		Category:       resRepo.Category,
-		Photos:         resRepo.Photos,
+		ID:            resRepo.ID,
+		NamaProduk:    resRepo.NamaProduk,
+		Slug:          resRepo.Slug,
+		HargaReseller: resRepo.HargaReseller,
+		HargaKonsumen: resRepo.HargaKonsumen,
+		Stok:          resRepo.Stok,
+		Deskripsi:     resRepo.Deskripsi,
+		Toko:          resRepo.Toko,
+		Category:      resRepo.Category,
+		Photos:        resRepo.Photos,
 	}
 
 	return &data, nil
@@ -180,13 +179,13 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 	slug := utils.CreateSlug(productReq.NamaProduk)
 
 	data := entity.Product{
-		NamaProduk: productReq.NamaProduk,
-		CategoryID: productReq.CategoryID,
-		Slug: slug,
+		NamaProduk:    productReq.NamaProduk,
+		CategoryID:    productReq.CategoryID,
+		Slug:          slug,
 		HargaReseller: productReq.HargaReseller,
 		HargaKonsumen: productReq.HargaKonsumen,
-		Stok: productReq.Stok,
-		Deskripsi: productReq.Deskripsi,
+		Stok:          productReq.Stok,
+		Deskripsi:     productReq.Deskripsi,
 	}
 
 	resUpdateRepo, errRepo := u.productRepo.UpdateProductByID(ctx, id, data)
@@ -199,7 +198,7 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 }
 
 func (u *ProductUseCaseImpl) DeleteProductByID(ctx context.Context, productId uint) (string, *helper.ErrorStruct) {
-	
+
 	_, errRepo := u.productRepo.GetProductByID(ctx, productId)
 	if errRepo != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")

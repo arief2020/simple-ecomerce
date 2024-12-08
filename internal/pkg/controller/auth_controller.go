@@ -42,26 +42,25 @@ func (uc *AuthControllerImpl) Login(ctx *fiber.Ctx) error {
 		return helper.BuildResponse(ctx, false, "Failed to Login user", err.Err.Error(), nil, fiber.StatusUnauthorized)
 	}
 
-	
 	return helper.BuildResponse(ctx, true, "Succeed to POST data", nil, res, fiber.StatusCreated)
 }
 
 func (uc *AuthControllerImpl) Register(ctx *fiber.Ctx) error {
 
-    c := ctx.Context()
+	c := ctx.Context()
 
-    data := new(dto.CreateUser)
-    if err := ctx.BodyParser(data); err != nil {
+	data := new(dto.CreateUser)
+	if err := ctx.BodyParser(data); err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, fmt.Sprint("Error parse request body : ", err.Error()))
-        return helper.BuildResponse(ctx, false, "Failed to parse request body", err.Error(), nil, fiber.StatusBadRequest)
-    }
+		return helper.BuildResponse(ctx, false, "Failed to parse request body", err.Error(), nil, fiber.StatusBadRequest)
+	}
 
-    _, err := uc.authUsc.CreateUsers(c, *data)
-    if err != nil {
+	_, err := uc.authUsc.CreateUsers(c, *data)
+	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, fmt.Sprint("Error Register user : ", err.Err.Error()))
-        return helper.BuildResponse(ctx, false, "Failed to POST data", err.Err.Error(), nil, fiber.StatusBadRequest)
-    }
+		return helper.BuildResponse(ctx, false, "Failed to POST data", err.Err.Error(), nil, fiber.StatusBadRequest)
+	}
 
-    return helper.BuildResponse(ctx, true, "Succeed to POST data", nil, "Register Succeed", fiber.StatusCreated)
+	return helper.BuildResponse(ctx, true, "Succeed to POST data", nil, "Register Succeed", fiber.StatusCreated)
 
 }

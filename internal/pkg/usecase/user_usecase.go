@@ -19,7 +19,7 @@ type UserUseCase interface {
 	UpdateMyProfile(ctx context.Context, id uint, params dto.UpdateUser) (string, *helper.ErrorStruct)
 
 	GetMyAlamat(ctx context.Context, id uint, params dto.FiltersAlamat) ([]*dto.AlamatResp, *helper.ErrorStruct)
-	
+
 	CreateMyNewAlamat(ctx context.Context, id uint, params dto.InserAlamatReq) (int, *helper.ErrorStruct)
 
 	GetMyAlamatById(ctx context.Context, id uint, idAlamat uint) (*dto.AlamatResp, *helper.ErrorStruct)
@@ -28,13 +28,13 @@ type UserUseCase interface {
 }
 
 type UserUseCaseImpl struct {
-	userrepository repository.UsersRepository
+	userrepository         repository.UsersRepository
 	provinceCityRepository repository.ProvinceCityRepository
 }
 
 func NewUserUseCase(userrepository repository.UsersRepository, provinceCityRepository repository.ProvinceCityRepository) UserUseCase {
 	return &UserUseCaseImpl{
-		userrepository: userrepository,
+		userrepository:         userrepository,
 		provinceCityRepository: provinceCityRepository,
 	}
 
@@ -60,7 +60,7 @@ func (uc *UserUseCaseImpl) GetMyProfile(ctx context.Context, id uint) (*dto.User
 			Code: fiber.StatusBadRequest,
 		}
 	}
-	
+
 	dataCity, errRepo := uc.provinceCityRepository.GetCityByID(ctx, user.IdKota)
 
 	if errRepo != nil {
@@ -75,15 +75,15 @@ func (uc *UserUseCaseImpl) GetMyProfile(ctx context.Context, id uint) (*dto.User
 
 	// Map entity.User ke dto.UserResp
 	resp := &dto.UserResp{
-		Nama:     user.Nama,
-		NoTelp:   user.NoTelp,
-		Email:    user.Email,
-		Tentang:  user.Tentang,
-		Pekerjaan: user.Pekerjaan,
+		Nama:         user.Nama,
+		NoTelp:       user.NoTelp,
+		Email:        user.Email,
+		Tentang:      user.Tentang,
+		Pekerjaan:    user.Pekerjaan,
 		TanggalLahir: birthDate,
-		IdKota: dataCity,
-		IdProvinsi: dataProvince,
-		IsAdmin: user.IsAdmin,
+		IdKota:       dataCity,
+		IdProvinsi:   dataProvince,
+		IsAdmin:      user.IsAdmin,
 		// Lakukan mapping lainnya jika diperlukan
 	}
 	return resp, nil
@@ -118,7 +118,7 @@ func (uc *UserUseCaseImpl) UpdateMyProfile(ctx context.Context, id uint, params 
 	user.Email = params.Email
 	user.IdProvinsi = params.IdProvinsi
 	user.IdKota = params.IdKota
-	
+
 	resUpdate, errRepo := uc.userrepository.UpdateUserById(ctx, id, user)
 	if errRepo != nil {
 		fmt.Println("debug updatemyprofile 2")
@@ -214,10 +214,9 @@ func (uc *UserUseCaseImpl) GetMyAlamatById(ctx context.Context, id uint, idAlama
 			return nil, &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("alamat not found"),
-
+			}
 		}
-	}
-	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at GetMyAlamatByID")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at GetMyAlamatByID")
 		return nil, &helper.ErrorStruct{
 			Err:  errRepo,
 			Code: fiber.StatusBadRequest,
@@ -253,9 +252,8 @@ func (uc *UserUseCaseImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAl
 			return "", &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("record not found"),
+			}
 
-		}
-			
 		}
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Alamat By Id")
 		return "", &helper.ErrorStruct{
@@ -278,7 +276,7 @@ func (uc *UserUseCaseImpl) UpdateMyAlamatById(ctx context.Context, id uint, idAl
 		return "", &helper.ErrorStruct{
 			Err:  errRepo,
 			Code: fiber.StatusBadRequest,
-		}	
+		}
 	}
 
 	return "Succeed to Update data", nil
@@ -302,9 +300,8 @@ func (uc *UserUseCaseImpl) DeleteMyAlamatById(ctx context.Context, id uint, idAl
 			return "", &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("record not found"),
+			}
 
-		}
-			
 		}
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error at DeleteMyAlamatByID")
 		return "", &helper.ErrorStruct{

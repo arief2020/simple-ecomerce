@@ -23,7 +23,6 @@ func NewTrxController(trxUsc usecase.TrxUseCase) TrxController {
 	return &TrxControllerImpl{trxUsc: trxUsc}
 }
 
-
 func (t *TrxControllerImpl) CreateTransction(ctx *fiber.Ctx) error {
 	var req dto.TransactionRequest
 	if err := ctx.BodyParser(&req); err != nil {
@@ -57,8 +56,8 @@ func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 	}
 
 	resUsc, errUsc := t.trxUsc.GetAllTransaction(ctx.Context(), dto.AllTransactionReq{
-		Limit: filter.Limit,
-		Page: filter.Page,
+		Limit:  filter.Limit,
+		Page:   filter.Page,
 		Search: filter.Search,
 	}, uint(userIdUint))
 
@@ -69,7 +68,6 @@ func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, resUsc, fiber.StatusOK)
 }
-
 
 func (t *TrxControllerImpl) GetTransactionByID(ctx *fiber.Ctx) error {
 	userId := ctx.Locals("userid").(string)

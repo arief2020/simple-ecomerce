@@ -17,7 +17,6 @@ import (
 // 	provCityUsc authUsc.UsersUseCase
 // }
 
-
 type ProvinceCityController interface {
 	GetAllProvinces(ctx *fiber.Ctx) error
 	GetAllCitiesByProvinceID(ctx *fiber.Ctx) error

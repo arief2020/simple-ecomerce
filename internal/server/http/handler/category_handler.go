@@ -15,6 +15,6 @@ func CategoryRoute(r fiber.Router, categoryUsc usecase.CategoryUseCase) {
 	categoryAPI.Get("", controller.GetAllCategory)
 	categoryAPI.Get("/:id", middleware.MiddlewareAuth, middleware.MiddlewareAdmin, controller.GetCategoryByID)
 	categoryAPI.Post("", middleware.MiddlewareAuth, middleware.MiddlewareAdmin, controller.CreateCategory)
-	categoryAPI.Put("/:id",middleware.MiddlewareAuth, middleware.MiddlewareAdmin, controller.UpdateCategoryByID)
-	categoryAPI.Delete("/:id",middleware.MiddlewareAuth, middleware.MiddlewareAdmin, controller.DeleteCategoryByID)
+	categoryAPI.Put("/:id", middleware.MiddlewareAuth, middleware.MiddlewareAdmin, controller.UpdateCategoryByID)
+	categoryAPI.Delete("/:id", middleware.MiddlewareAuth, middleware.MiddlewareAdmin, controller.DeleteCategoryByID)
 }

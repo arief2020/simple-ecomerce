@@ -33,7 +33,7 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 	// 			"error": "Field 'nama_produk' is required",
 	// 		})
 	// 	}
-		
+
 	// 	categoryId := ctx.FormValue("category_id")
 	// 	if categoryId == "" {
 	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -70,39 +70,39 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 	// 		})
 	// 	}
 	data := new(dto.ProductCreateReq)
-	if err:= ctx.BodyParser(data); err != nil {
+	if err := ctx.BodyParser(data); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
 		})
 	}
 
-		userId := ctx.Locals("userid").(string)
-		userIdInt := utils.StringToUint(userId)
-		
-		dataReq := &dto.ProductCreateReq {
-			NamaProduk:   data.NamaProduk,
-			CategoryID:   data.CategoryID,
-			HargaReseller: data.HargaReseller,
-			HargaKonsumen: data.HargaKonsumen,
-			Stok:         data.Stok,
-			Deskripsi:    data.Deskripsi,
-		}
+	userId := ctx.Locals("userid").(string)
+	userIdInt := utils.StringToUint(userId)
 
-		files, err := ctx.MultipartForm()
-		if err != nil {
-			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Failed to parse multipart form")
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Failed to parse multipart form",
-			})
-		}
+	dataReq := &dto.ProductCreateReq{
+		NamaProduk:    data.NamaProduk,
+		CategoryID:    data.CategoryID,
+		HargaReseller: data.HargaReseller,
+		HargaKonsumen: data.HargaKonsumen,
+		Stok:          data.Stok,
+		Deskripsi:     data.Deskripsi,
+	}
 
-		photos := files.File["photos"]
+	files, err := ctx.MultipartForm()
+	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Failed to parse multipart form")
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Failed to parse multipart form",
+		})
+	}
 
-		resUsc, errUsc := c.productUsc.CreateProduct(ctx.Context(), *dataReq, photos, uint(userIdInt))
-		if errUsc != nil {
-			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
-			return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc, nil, fiber.StatusBadRequest)
-		}
+	photos := files.File["photos"]
+
+	resUsc, errUsc := c.productUsc.CreateProduct(ctx.Context(), *dataReq, photos, uint(userIdInt))
+	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
+		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc, nil, fiber.StatusBadRequest)
+	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, resUsc, fiber.StatusOK)
 }
@@ -116,11 +116,11 @@ func (c *ProductControllerImpl) GetAllProduct(ctx *fiber.Ctx) error {
 	resUsc, errUsc := c.productUsc.GetAllProduct(ctx.Context(), dto.AllProductFilter{
 		NamaProduk: filter.NamaProduk,
 		CategoryID: filter.CategoryID,
-		TokoID: filter.TokoID,
-		MinHarga: filter.MinHarga,
-		MaxHarga: filter.MaxHarga,
-		Limit: filter.Limit,
-		Page: filter.Page,
+		TokoID:     filter.TokoID,
+		MinHarga:   filter.MinHarga,
+		MaxHarga:   filter.MaxHarga,
+		Limit:      filter.Limit,
+		Page:       filter.Page,
 	})
 	if errUsc != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Product")
@@ -161,14 +161,13 @@ func (c *ProductControllerImpl) UpdateProductByID(ctx *fiber.Ctx) error {
 	categoryId := ctx.FormValue("category_id")
 	formatCategory := utils.StringToUint(categoryId)
 
-
-	data:= dto.ProductUpdateReq{
-		NamaProduk:   ctx.FormValue("nama_produk"),
-		CategoryID:   uint(formatCategory),
+	data := dto.ProductUpdateReq{
+		NamaProduk:    ctx.FormValue("nama_produk"),
+		CategoryID:    uint(formatCategory),
 		HargaReseller: ctx.FormValue("harga_reseller"),
 		HargaKonsumen: ctx.FormValue("harga_konsumen"),
-		Stok:         ctx.FormValue("stok"),
-		Deskripsi:    ctx.FormValue("deskripsi"),
+		Stok:          ctx.FormValue("stok"),
+		Deskripsi:     ctx.FormValue("deskripsi"),
 	}
 
 	_, errUsc := c.productUsc.UpdateProductByID(ctx.Context(), uint(productId), data)

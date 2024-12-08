@@ -21,15 +21,15 @@ var v *viper.Viper
 
 type (
 	Container struct {
-		Mysqldb  *gorm.DB
-		Apps     *Apps
-		AuthUsc  usecase.AuthsUseCase
-		UserUsc  usecase.UserUseCase
+		Mysqldb         *gorm.DB
+		Apps            *Apps
+		AuthUsc         usecase.AuthsUseCase
+		UserUsc         usecase.UserUseCase
 		ProvinceCityUsc usecase.ProvinceCityUseCase
-		TokoUsc  usecase.TokoUseCase
-		CategoryUsc usecase.CategoryUseCase
-		ProductUsc usecase.ProductUseCase
-		TrxUsc usecase.TrxUseCase
+		TokoUsc         usecase.TokoUseCase
+		CategoryUsc     usecase.CategoryUseCase
+		ProductUsc      usecase.ProductUseCase
+		TrxUsc          usecase.TrxUseCase
 	}
 
 	Apps struct {
@@ -69,7 +69,6 @@ func init() {
 		helper.Logger(currentfilepath, helper.LoggerLevelPanic, fmt.Sprintf("failed read config : %s", err.Error()))
 	}
 
-
 	err = v.ReadInConfig()
 	if err != nil {
 		helper.Logger(currentfilepath, helper.LoggerLevelPanic, fmt.Sprintf("failed init config : %s", err.Error()))
@@ -108,15 +107,15 @@ func InitContainer() (cont *Container) {
 	trxUsc := usecase.NewTrxUseCase(trxRepo, userRepo, productRepo)
 
 	return &Container{
-		Apps:     &apps,
-		Mysqldb:  mysqldb,
-		AuthUsc:  authUsc,
-		UserUsc:  userUsc,
+		Apps:            &apps,
+		Mysqldb:         mysqldb,
+		AuthUsc:         authUsc,
+		UserUsc:         userUsc,
 		ProvinceCityUsc: provinceCityUsc,
-		TokoUsc:  tokoUsc,
-		CategoryUsc: categoryUsc,
-		ProductUsc: productUsc,
-		TrxUsc:  trxUsc,
+		TokoUsc:         tokoUsc,
+		CategoryUsc:     categoryUsc,
+		ProductUsc:      productUsc,
+		TrxUsc:          trxUsc,
 	}
 
 }

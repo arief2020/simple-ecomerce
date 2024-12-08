@@ -17,5 +17,5 @@ func ProductRoute(r fiber.Router, productUsc usecase.ProductUseCase) {
 	productApi.Get("/:id_product", controller.GetProductByID)
 	productApi.Put("/:id_product", middleware.MiddlewareAuth, controller.UpdateProductByID)
 	productApi.Delete("/:id_product", middleware.MiddlewareAuth, controller.DeleteProductByID)
-	
+
 }

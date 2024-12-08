@@ -8,7 +8,7 @@ import (
 
 type Category struct {
 	gorm.Model
-	ID       uint    `gorm:"primarykey;autoIncrement" json:"id"`
+	ID           uint   `gorm:"primarykey;autoIncrement" json:"id"`
 	NamaCategory string `gorm:"type:varchar(255)" json:"nama_category" validate:"required"`
 
 	// CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`

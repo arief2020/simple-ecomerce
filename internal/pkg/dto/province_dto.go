@@ -5,9 +5,6 @@ type ListProvResp struct {
 	Name string `json:"name"`
 }
 
-
-
-
 type ProvinceFilter struct {
 	Page   int    `query:"page"`
 	Limit  int    `query:"limit"`
@@ -20,7 +17,7 @@ type ProvinceResp struct {
 }
 
 type CityResp struct {
-	Id   string `json:"id"`
+	Id         string `json:"id"`
 	ProvinceId string `json:"province_id"`
-	Name string `json:"name"`
+	Name       string `json:"name"`
 }

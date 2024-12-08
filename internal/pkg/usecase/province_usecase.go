@@ -91,5 +91,3 @@ func (alc *ProvinceCityUseCaseImpl) GetCityByID(ctx context.Context, cityid stri
 
 	return res, nil
 }
-
-

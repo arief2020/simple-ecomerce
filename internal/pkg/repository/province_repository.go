@@ -16,7 +16,6 @@ const provinceCityListCityByProvinceAPI = "https://emsifa.github.io/api-wilayah-
 const provinceCityDetailProvinceAPI = "https://emsifa.github.io/api-wilayah-indonesia/api/province/%s.json"
 const provinceCityDetailCityAPI = "https://emsifa.github.io/api-wilayah-indonesia/api/regency/%s.json"
 
-
 type ProvinceCityRepository interface {
 	GetAllProvinces(ctx context.Context, limit, offset int, search string) (res []*dto.ProvinceResp, err error)
 	GetAllCitiesByProvinceID(ctx context.Context, provinceid string) (res []*dto.CityResp, err error)
@@ -119,4 +118,3 @@ func (alr *ProvinceCityRepositoryImpl) GetCityByID(ctx context.Context, cityid s
 
 	return res, nil
 }
-

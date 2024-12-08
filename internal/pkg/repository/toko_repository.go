@@ -45,7 +45,6 @@ func (r *TokoRepositoryImpl) CreateToko(ctx context.Context, toko entity.Toko) (
 	return toko, nil
 }
 
-
 func (r *TokoRepositoryImpl) GetAllToko(ctx context.Context, params dto.TokoFilter) (tokos []entity.Toko, err error) {
 	db := r.db
 
@@ -59,7 +58,6 @@ func (r *TokoRepositoryImpl) GetAllToko(ctx context.Context, params dto.TokoFilt
 	}
 	return tokos, nil
 }
-
 
 func (r *TokoRepositoryImpl) UpdateToko(ctx context.Context, id uint, nama_toko string, url_foto string) error {
 	var toko entity.Toko

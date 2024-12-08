@@ -30,7 +30,7 @@ func MiddlewareGetHeader(ctx *fiber.Ctx) error {
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error marshal header")
 	}
-	helper.Logger(utils.GetFunctionPath(),helper.LoggerLevelInfo, string(ress))
+	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, string(ress))
 
 	return ctx.Next()
 }
@@ -45,14 +45,13 @@ func MiddlewareAuth(ctx *fiber.Ctx) error {
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error marshal header")
 	}
-	helper.Logger(utils.GetFunctionPath(),helper.LoggerLevelInfo, string(ress))
+	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, string(ress))
 
 	data, err := utils.DecodeToken(header.Token)
 	if err != nil {
 		return helper.BuildResponse(ctx, false, "Failed to decode token", err.Error(), nil, fiber.StatusUnauthorized)
 	}
 	fmt.Printf("User Data: %+v\n", data)
-
 
 	ctx.Locals("userid", data["id"])
 	ctx.Locals("useremail", data["email"])

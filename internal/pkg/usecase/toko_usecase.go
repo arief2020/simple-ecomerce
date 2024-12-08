@@ -13,7 +13,7 @@ import (
 )
 
 type TokoUseCase interface {
-	GetMyToko(ctx context.Context, id uint) ( *dto.MyTokoResp, *helper.ErrorStruct)
+	GetMyToko(ctx context.Context, id uint) (*dto.MyTokoResp, *helper.ErrorStruct)
 	UpdateMyToko(ctx context.Context, userId uint, idToko uint, params *dto.UpdateProfileTokoReq, file *multipart.FileHeader) (string, *helper.ErrorStruct)
 
 	GetAllToko(ctx context.Context, params dto.TokoFilter) (*dto.AllTokoResp, *helper.ErrorStruct)
@@ -36,17 +36,16 @@ func (t *TokoUseCaseImpl) GetMyToko(ctx context.Context, id uint) (*dto.MyTokoRe
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Toko")
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
-			Err:     errors.New("toko tidak ditemukan"),
+			Err:  errors.New("toko tidak ditemukan"),
 		}
 	}
 	return &dto.MyTokoResp{
-		ID:        toko.ID,
-		NamaToko:  toko.NamaToko,
-		UrlFoto:   toko.UrlFoto,
-		UserID:    toko.UserID,
+		ID:       toko.ID,
+		NamaToko: toko.NamaToko,
+		UrlFoto:  toko.UrlFoto,
+		UserID:   toko.UserID,
 	}, nil
 }
-
 
 func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.TokoResp, *helper.ErrorStruct) {
 	toko, err := t.tokoRepository.GetTokoById(ctx, id)
@@ -54,13 +53,13 @@ func (t *TokoUseCaseImpl) GetTokoByID(ctx context.Context, id uint) (*dto.TokoRe
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By ID")
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
-			Err:     errors.New("toko tidak ditemukan"),
+			Err:  errors.New("toko tidak ditemukan"),
 		}
 	}
 	return &dto.TokoResp{
-		ID:        toko.ID,
-		NamaToko:  toko.NamaToko,
-		UrlFoto:   toko.UrlFoto,
+		ID:       toko.ID,
+		NamaToko: toko.NamaToko,
+		UrlFoto:  toko.UrlFoto,
 	}, nil
 }
 
@@ -74,17 +73,17 @@ func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context, params dto.TokoFilter)
 	} else {
 		params.Page = (params.Page - 1) * params.Limit
 	}
-	
+
 	toko, err := t.tokoRepository.GetAllToko(ctx, dto.TokoFilter{
 		Limit: params.Limit,
 		Page:  params.Page,
-		Nama: params.Nama,
+		Nama:  params.Nama,
 	})
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Toko")
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusBadRequest,
-			Err:     errors.New("toko tidak ditemukan"),
+			Err:  errors.New("toko tidak ditemukan"),
 		}
 	}
 
@@ -95,13 +94,11 @@ func (t *TokoUseCaseImpl) GetAllToko(ctx context.Context, params dto.TokoFilter)
 
 	var tokoResp []dto.TokoResp
 
-
-
 	for _, toko := range toko {
 		tokoResp = append(tokoResp, dto.TokoResp{
-			ID:        toko.ID,
-			NamaToko:  toko.NamaToko,
-			UrlFoto:   toko.UrlFoto,
+			ID:       toko.ID,
+			NamaToko: toko.NamaToko,
+			UrlFoto:  toko.UrlFoto,
 		})
 	}
 

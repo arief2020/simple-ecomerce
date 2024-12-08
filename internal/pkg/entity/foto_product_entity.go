@@ -17,16 +17,14 @@ import (
 // 	// DeletedAt gorm.DeletedAt `gorm:"-" json:"deleted_at"`
 // }
 
-
 // type FotoProduct struct {
 //     gorm.Model
 //     UrlFoto  string  `gorm:"type:varchar(255)" json:"url_foto" validate:"required"`
 //     ProductID uint   `gorm:"not null;column:id_product" json:"product_id"` // GORM akan membuat foreign key ini secara otomatis
 // }
 
-
 type FotoProduct struct {
-    gorm.Model
-    UrlFoto   string `gorm:"type:varchar(255)" json:"url_foto" validate:"required"`
-    ProductID uint   `gorm:"not null;column:id_product" json:"product_id"` // Foreign key otomatis
+	gorm.Model
+	UrlFoto   string `gorm:"type:varchar(255)" json:"url_foto" validate:"required"`
+	ProductID uint   `gorm:"not null;column:id_product" json:"product_id"` // Foreign key otomatis
 }

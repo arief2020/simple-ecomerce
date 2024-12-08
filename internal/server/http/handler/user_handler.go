@@ -12,9 +12,9 @@ func UserRoute(r fiber.Router, userUsc usecase.UserUseCase) {
 	controller := controller.NewUserController(userUsc)
 
 	userAPI := r.Group("/user")
-	userAPI.Get("",middleware.MiddlewareAuth, controller.GetMyProfile)
+	userAPI.Get("", middleware.MiddlewareAuth, controller.GetMyProfile)
 	userAPI.Put("", middleware.MiddlewareAuth, controller.UpdateMyProfile)
-	
+
 	userAPI.Get("/alamat", middleware.MiddlewareAuth, controller.GetMyAlamat)
 	userAPI.Post("/alamat", middleware.MiddlewareAuth, controller.CreateMyNewAlamat)
 	userAPI.Get("alamat/:id", middleware.MiddlewareAuth, controller.GetMyAlamatById)

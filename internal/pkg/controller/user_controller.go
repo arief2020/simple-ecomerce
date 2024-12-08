@@ -86,9 +86,7 @@ func (uc *UserControllerImpl) GetMyAlamat(ctx *fiber.Ctx) error {
 		filter.JudulAlamat = queryJudulAlamat
 	}
 
-
 	fmt.Printf("Filter: %+v\n", filter)
-
 
 	res, errStruct := uc.userUsc.GetMyAlamat(ctx.Context(), uint(id), dto.FiltersAlamat{
 		JudulAlamat: filter.JudulAlamat,
@@ -102,7 +100,7 @@ func (uc *UserControllerImpl) GetMyAlamat(ctx *fiber.Ctx) error {
 }
 
 func (uc *UserControllerImpl) CreateMyNewAlamat(ctx *fiber.Ctx) error {
-	idStr := ctx.Locals("userid").(string) // Ambil ID sebagai string
+	idStr := ctx.Locals("userid").(string)      // Ambil ID sebagai string
 	id, err := strconv.ParseUint(idStr, 10, 32) // Konversi string ke uint
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse User ID")
@@ -125,14 +123,14 @@ func (uc *UserControllerImpl) CreateMyNewAlamat(ctx *fiber.Ctx) error {
 }
 
 func (uc *UserControllerImpl) GetMyAlamatById(ctx *fiber.Ctx) error {
-	idStr := ctx.Locals("userid").(string) 
-	id, err := strconv.ParseUint(idStr, 10, 32) 
+	idStr := ctx.Locals("userid").(string)
+	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse User ID")
 		return helper.BuildResponse(ctx, false, "Invalid user ID", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	idAlamat, err := strconv.ParseUint(ctx.Params("id"), 10, 32) 
+	idAlamat, err := strconv.ParseUint(ctx.Params("id"), 10, 32)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse Alamat ID")
 		return helper.BuildResponse(ctx, false, "Invalid Alamat ID", err.Error(), nil, fiber.StatusBadRequest)

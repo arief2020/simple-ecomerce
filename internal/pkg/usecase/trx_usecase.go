@@ -16,75 +16,73 @@ import (
 )
 
 type TrxUseCase interface {
-	CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint ) (int, *helper.ErrorStruct)
+	CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint) (int, *helper.ErrorStruct)
 	// GetAllTransctionByUserID(ctx context.Context, userId uint) ([]entity.Trx, *helper.ErrorStruct)
 	GetAllTransaction(ctx context.Context, req dto.AllTransactionReq, userId uint) (*dto.AllTransactionResponse, *helper.ErrorStruct)
 	GetTransactionByID(ctx context.Context, trxId uint, userId uint) (*dto.TransactionResponse, *helper.ErrorStruct)
 }
 
 type TrxUseCaseImpl struct {
-	trxRepo repository.TrxRepository
-	userRepo repository.UsersRepository
+	trxRepo     repository.TrxRepository
+	userRepo    repository.UsersRepository
 	productRepo repository.ProductRepository
 }
 
 func NewTrxUseCase(trxRepo repository.TrxRepository, userRepo repository.UsersRepository, productRepo repository.ProductRepository) TrxUseCase {
 	return &TrxUseCaseImpl{
-		trxRepo: trxRepo,
-		userRepo: userRepo,
+		trxRepo:     trxRepo,
+		userRepo:    userRepo,
 		productRepo: productRepo,
 	}
 }
-
-
 
 func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint) (int, *helper.ErrorStruct) {
 	_, err := t.userRepo.GetUserById(ctx, userId)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get User By ID")
 		return 0, &helper.ErrorStruct{
-			Err: err,
+			Err:  err,
 			Code: fiber.StatusBadRequest,
 		}
 	}
 
 	dataDetailsTrx := []entity.DetailTrx{}
 	trxTotal := 0
-	
+
 	for _, detailTrx := range trxDto.DetailTrx {
 		resRepoProduct, errRepoProduct := t.productRepo.GetProductByID(ctx, uint(detailTrx.ProductID))
 		if errRepoProduct != nil {
 			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get Product By ID")
 			return 0, &helper.ErrorStruct{
-				Err: errRepoProduct,
+				Err:  errRepoProduct,
 				Code: fiber.StatusBadRequest,
 			}
 		}
 		intStock := utils.StringToUint(resRepoProduct.Stok)
 		if int(intStock) < detailTrx.Kuantitas {
 			return 0, &helper.ErrorStruct{
-				Err: errRepoProduct,
+				Err:  errRepoProduct,
 				Code: fiber.StatusBadRequest,
 			}
 		}
 
 		dataLogProduct := entity.LogProduct{
-			ProductID: resRepoProduct.ID,
-			NamaProduk: resRepoProduct.NamaProduk,
-			Slug: resRepoProduct.Slug,
+			ProductID:     resRepoProduct.ID,
+			NamaProduk:    resRepoProduct.NamaProduk,
+			Slug:          resRepoProduct.Slug,
 			HargaReseller: resRepoProduct.HargaReseller,
 			HargaKonsumen: resRepoProduct.HargaKonsumen,
-			Stok: resRepoProduct.Stok,
-			Deskripsi: resRepoProduct.Deskripsi,
-			TokoID: resRepoProduct.Toko.ID,
-			CategoryID: resRepoProduct.Category.ID,
+			Stok:          resRepoProduct.Stok,
+			Deskripsi:     resRepoProduct.Deskripsi,
+			TokoID:        resRepoProduct.Toko.ID,
+			CategoryID:    resRepoProduct.Category.ID,
 		}
 
 		resRepoLogProduct, errRepoLogProduct := t.productRepo.CreateLogProduct(ctx, dataLogProduct)
 		if errRepoLogProduct != nil {
 			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Log Product")
 			return 0, &helper.ErrorStruct{
-				Err: errRepoLogProduct,
+				Err:  errRepoLogProduct,
 				Code: fiber.StatusBadRequest,
 			}
 		}
@@ -96,10 +94,10 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 		trxTotal += detailTrxTotal
 
 		dataDetailTrx := &entity.DetailTrx{
-			LogProductId: resRepoLogProduct.ID, 
-			TokoID: resRepoProduct.Toko.ID,
-			Kuantitas: detailTrx.Kuantitas,
-			HargaTotal: detailTrxTotal,
+			LogProductId: resRepoLogProduct.ID,
+			TokoID:       resRepoProduct.Toko.ID,
+			Kuantitas:    detailTrx.Kuantitas,
+			HargaTotal:   detailTrxTotal,
 		}
 
 		dataDetailsTrx = append(dataDetailsTrx, *dataDetailTrx)
@@ -107,19 +105,18 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 	}
 
 	dataTrx := &entity.Trx{
-		UserID:   userId,
-		AlamatID: uint(trxDto.AlamatKirim),
-		HargaTotal: trxTotal,
+		UserID:      userId,
+		AlamatID:    uint(trxDto.AlamatKirim),
+		HargaTotal:  trxTotal,
 		KodeInvoice: fmt.Sprintf("INV-%d", time.Now().UnixNano()),
 		MethodBayar: trxDto.MethodBayar,
 	}
-	
 
 	resRepoTrx, errRepoTrx := t.trxRepo.CreateTrx(ctx, *dataTrx)
 	if errRepoTrx != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Trx")
 		return 0, &helper.ErrorStruct{
-			Err: errRepoTrx,
+			Err:  errRepoTrx,
 			Code: fiber.StatusBadRequest,
 		}
 	}
@@ -131,7 +128,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 		if errRepoDetailTrx != nil {
 			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Detail Trx")
 			return 0, &helper.ErrorStruct{
-				Err: errRepoDetailTrx,
+				Err:  errRepoDetailTrx,
 				Code: fiber.StatusBadRequest,
 			}
 		}
@@ -161,22 +158,22 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 	for _, detail := range resRepoTrx.DetailTrx {
 		detailTrx = append(detailTrx, dto.DetailTrx{
 			Product: dto.TransactionProductResp{
-				ID:             detail.LogProduct.ID,
-				NamaProduk:     detail.LogProduct.NamaProduk,
-				Slug:           detail.LogProduct.Slug,
-				HargaReseller:  detail.LogProduct.HargaReseller,
-				HargaKonsumen:  detail.LogProduct.HargaKonsumen,
-				Deskripsi:      detail.LogProduct.Deskripsi,
-				Toko:           dto.TokoResp{
+				ID:            detail.LogProduct.ID,
+				NamaProduk:    detail.LogProduct.NamaProduk,
+				Slug:          detail.LogProduct.Slug,
+				HargaReseller: detail.LogProduct.HargaReseller,
+				HargaKonsumen: detail.LogProduct.HargaKonsumen,
+				Deskripsi:     detail.LogProduct.Deskripsi,
+				Toko: dto.TokoResp{
 					ID:       detail.LogProduct.Toko.ID,
 					NamaToko: detail.LogProduct.Toko.NamaToko,
 					UrlFoto:  detail.LogProduct.Toko.UrlFoto,
 				},
-				Category:       dto.CategoryResp{
+				Category: dto.CategoryResp{
 					ID:           detail.LogProduct.Category.ID,
 					NamaCategory: detail.LogProduct.Category.NamaCategory,
 				},
-				Photos:         mapPhotos(detail.LogProduct.Product.FotoProduct),
+				Photos: mapPhotos(detail.LogProduct.Product.FotoProduct),
 			},
 			Toko: dto.TokoResp{
 				ID:       detail.LogProduct.Toko.ID,
@@ -206,7 +203,6 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 	return dataResp, nil
 }
 
-
 func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTransactionReq, userId uint) (*dto.AllTransactionResponse, *helper.ErrorStruct) {
 	if req.Limit < 1 {
 		req.Limit = 10
@@ -229,28 +225,28 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 		for _, detail := range trx.DetailTrx {
 			detailTrx = append(detailTrx, dto.DetailTrx{
 				Product: dto.TransactionProductResp{
-					ID:             detail.LogProduct.ID,
-				NamaProduk:     detail.LogProduct.NamaProduk,
-				Slug:           detail.LogProduct.Slug,
-				HargaReseller:  detail.LogProduct.HargaReseller,
-				HargaKonsumen:  detail.LogProduct.HargaKonsumen,
-				Deskripsi:      detail.LogProduct.Deskripsi,
-				Toko:           dto.TokoResp{
+					ID:            detail.LogProduct.ID,
+					NamaProduk:    detail.LogProduct.NamaProduk,
+					Slug:          detail.LogProduct.Slug,
+					HargaReseller: detail.LogProduct.HargaReseller,
+					HargaKonsumen: detail.LogProduct.HargaKonsumen,
+					Deskripsi:     detail.LogProduct.Deskripsi,
+					Toko: dto.TokoResp{
+						ID:       detail.LogProduct.Toko.ID,
+						NamaToko: detail.LogProduct.Toko.NamaToko,
+						UrlFoto:  detail.LogProduct.Toko.UrlFoto,
+					},
+					Category: dto.CategoryResp{
+						ID:           detail.LogProduct.Category.ID,
+						NamaCategory: detail.LogProduct.Category.NamaCategory,
+					},
+					Photos: mapPhotos(detail.LogProduct.Product.FotoProduct),
+				},
+				Toko: dto.TokoResp{
 					ID:       detail.LogProduct.Toko.ID,
 					NamaToko: detail.LogProduct.Toko.NamaToko,
 					UrlFoto:  detail.LogProduct.Toko.UrlFoto,
 				},
-				Category:       dto.CategoryResp{
-					ID:           detail.LogProduct.Category.ID,
-					NamaCategory: detail.LogProduct.Category.NamaCategory,
-				},
-				Photos:         mapPhotos(detail.LogProduct.Product.FotoProduct),
-				},
-				Toko: dto.TokoResp{
-				ID:       detail.LogProduct.Toko.ID,
-				NamaToko: detail.LogProduct.Toko.NamaToko,
-				UrlFoto:  detail.LogProduct.Toko.UrlFoto,
-			},
 				Kuantitas:  detail.Kuantitas,
 				HargaTotal: detail.HargaTotal,
 			})
@@ -285,9 +281,9 @@ func mapPhotos(photos []entity.FotoProduct) []dto.PhotoProductResp {
 	var photoResps []dto.PhotoProductResp
 	for _, photo := range photos {
 		photoResps = append(photoResps, dto.PhotoProductResp{
-			Id:  photo.ID,
+			Id:        photo.ID,
 			ProductID: photo.ProductID,
-			Url: photo.UrlFoto,
+			Url:       photo.UrlFoto,
 		})
 	}
 	return photoResps
