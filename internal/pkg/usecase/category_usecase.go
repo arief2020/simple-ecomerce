@@ -8,6 +8,7 @@ import (
 	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/entity"
 	"tugas_akhir_example/internal/pkg/repository"
+	"tugas_akhir_example/internal/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -37,6 +38,7 @@ func (c *CategoryUseCaseImpl) GetAllCategory(ctx context.Context) ([]*dto.Catego
 	if err != nil {
 		return nil, &helper.ErrorStruct{
 			Err: err,
+			Code: fiber.StatusInternalServerError,
 		}
 	}
 
@@ -55,21 +57,18 @@ func (c *CategoryUseCaseImpl) GetCategoryByID(ctx context.Context, id uint) (*dt
 	category, err := c.categoryRepository.GetCategoryByID(ctx, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Println("debug 1")
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Get Category")
 		return nil, &helper.ErrorStruct{
 			Code: fiber.StatusNotFound,
 			Err:  errors.New("no data category"),
 	}
 }
+helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Get Category")
 		return nil, &helper.ErrorStruct{
 			Err: err,
 		}
 	}
 
-	fmt.Printf("Category: %+v\n", category)
-	
-	fmt.Printf("Error: %+v\n", err)
-	
 
 	return &dto.CategoryResp{
 		ID:          category.ID,
@@ -83,6 +82,7 @@ func (c *CategoryUseCaseImpl) CreateCategory(ctx context.Context, data dto.Categ
 	}
 	category, err := c.categoryRepository.CreateCategory(ctx, dataReq)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Category")
 		return nil, &helper.ErrorStruct{
 			Err: err,
 		}
@@ -100,6 +100,7 @@ func (c *CategoryUseCaseImpl) UpdateCategoryByID(ctx context.Context, id uint, d
 	}
 	category, err := c.categoryRepository.UpdateCategoryByID(ctx, id, dataReq)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Category")
 		return nil, &helper.ErrorStruct{
 			Err: err,
 		}
@@ -116,11 +117,13 @@ func (c *CategoryUseCaseImpl) DeleteCategoryByID(ctx context.Context, id uint) (
 	if err != nil {
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Delete Category")
 			return "", &helper.ErrorStruct{
 				Code: fiber.StatusNotFound,
 				Err:  errors.New("record not found"),
 			}
 		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Delete Category")
 		return "", &helper.ErrorStruct{
 			Err: err,
 		}
