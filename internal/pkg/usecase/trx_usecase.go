@@ -41,7 +41,7 @@ func NewTrxUseCase(trxRepo repository.TrxRepository, userRepo repository.UsersRe
 func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint) (int, *helper.ErrorStruct) {
 	_, err := t.userRepo.GetUserById(ctx, userId)
 	if err != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, fmt.Sprintf("Error when get user by id : %s", err.Error()))
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get User By ID")
 		return 0, &helper.ErrorStruct{
 			Err: err,
 			Code: fiber.StatusBadRequest,
@@ -54,6 +54,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 	for _, detailTrx := range trxDto.DetailTrx {
 		resRepoProduct, errRepoProduct := t.productRepo.GetProductByID(ctx, uint(detailTrx.ProductID))
 		if errRepoProduct != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get Product By ID")
 			return 0, &helper.ErrorStruct{
 				Err: errRepoProduct,
 				Code: fiber.StatusBadRequest,
@@ -81,6 +82,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 		resRepoLogProduct, errRepoLogProduct := t.productRepo.CreateLogProduct(ctx, dataLogProduct)
 		if errRepoLogProduct != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Log Product")
 			return 0, &helper.ErrorStruct{
 				Err: errRepoLogProduct,
 				Code: fiber.StatusBadRequest,
@@ -115,6 +117,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 	resRepoTrx, errRepoTrx := t.trxRepo.CreateTrx(ctx, *dataTrx)
 	if errRepoTrx != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Trx")
 		return 0, &helper.ErrorStruct{
 			Err: errRepoTrx,
 			Code: fiber.StatusBadRequest,
@@ -126,6 +129,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 		_, errRepoDetailTrx := t.trxRepo.CreateDetailTrx(ctx, detailTrx)
 		if errRepoDetailTrx != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Detail Trx")
 			return 0, &helper.ErrorStruct{
 				Err: errRepoDetailTrx,
 				Code: fiber.StatusBadRequest,
@@ -139,11 +143,14 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 	resRepoTrx, errRepoTrx := t.trxRepo.GetTrxByID(ctx, trxId, userId)
 	if errRepoTrx != nil {
 		if errors.Is(errRepoTrx, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Transaction Not Found")
 			return nil, &helper.ErrorStruct{
 				Err:  errors.New("transaction not found"),
 				Code: fiber.StatusNotFound,
 			}
 		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get Trx By ID")
+
 		return nil, &helper.ErrorStruct{
 			Err:  errRepoTrx,
 			Code: fiber.StatusInternalServerError,
@@ -218,7 +225,6 @@ func (t *TrxUseCaseImpl) GetAllTransaction(ctx context.Context, req dto.AllTrans
 
 	var transactionResponses []dto.TransactionResponse
 	for _, trx := range transactions {
-		// Detail transaksi
 		var detailTrx []dto.DetailTrx
 		for _, detail := range trx.DetailTrx {
 			detailTrx = append(detailTrx, dto.DetailTrx{

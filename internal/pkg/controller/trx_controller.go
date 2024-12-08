@@ -25,12 +25,10 @@ func NewTrxController(trxUsc usecase.TrxUseCase) TrxController {
 
 
 func (t *TrxControllerImpl) CreateTransction(ctx *fiber.Ctx) error {
-	// Parse JSON body ke DTO
 	var req dto.TransactionRequest
 	if err := ctx.BodyParser(&req); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Invalid request body",
-		})
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error parsing request body: "+err.Error())
+		return helper.BuildResponse(ctx, false, "Failed to parse request body", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	userId := ctx.Locals("userid").(string)
@@ -40,17 +38,12 @@ func (t *TrxControllerImpl) CreateTransction(ctx *fiber.Ctx) error {
 	resUsc, errUsc := t.trxUsc.CreateTrx(ctx.Context(), req, uint(userIdUint))
 
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Transaction")
 		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc, nil, fiber.StatusBadRequest)
 	}
 
-	// Kembalikan request sebagai respons
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx:        ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       resUsc,
-	})
+	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, resUsc, fiber.StatusCreated)
 }
-
 
 func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 	userId := ctx.Locals("userid").(string)
@@ -59,6 +52,7 @@ func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 
 	filter := new(dto.AllTransactionReq)
 	if err := ctx.QueryParser(filter); err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse Request Query")
 		return helper.BuildResponse(ctx, false, "Failed to parse query params", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
@@ -69,10 +63,10 @@ func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 	}, uint(userIdUint))
 
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Transaction")
 		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc, nil, fiber.StatusBadRequest)
 	}
 
-	// Kembalikan request sebagai respons
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, resUsc, fiber.StatusOK)
 }
 
@@ -82,15 +76,16 @@ func (t *TrxControllerImpl) GetTransactionByID(ctx *fiber.Ctx) error {
 	uintUserId := utils.StringToUint(userId)
 	id, err := ctx.ParamsInt("id_trx")
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse Request Query")
 		return helper.BuildResponse(ctx, false, "Failed to GET data 1", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	resUsc, errUsc := t.trxUsc.GetTransactionByID(ctx.Context(), uint(id), uint(uintUserId))
 
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Transaction By ID")
 		return helper.BuildResponse(ctx, false, "Failed to GET data 2", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
-	// Kembalikan request sebagai respons
 	return helper.BuildResponse(ctx, true, "Succeed to GET data 3", nil, resUsc, fiber.StatusOK)
 }
