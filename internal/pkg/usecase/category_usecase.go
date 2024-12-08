@@ -96,6 +96,21 @@ func (c *CategoryUseCaseImpl) UpdateCategoryByID(ctx context.Context, id uint, d
 	dataReq := entity.Category{
 		NamaCategory: data.NamaCategory,
 	}
+	_, errGetCategory := c.categoryRepository.GetCategoryByID(ctx, id)
+	if errGetCategory != nil {
+		if errors.Is(errGetCategory, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Get Category")
+			return nil, &helper.ErrorStruct{
+				Code: fiber.StatusNotFound,
+				Err:  errors.New("no data category"),
+			}
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Category By Id")
+		return nil, &helper.ErrorStruct{
+			Err: errGetCategory,
+			Code: fiber.StatusBadRequest,
+		}
+	}
 	category, err := c.categoryRepository.UpdateCategoryByID(ctx, id, dataReq)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Category")

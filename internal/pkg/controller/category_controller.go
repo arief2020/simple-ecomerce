@@ -31,7 +31,7 @@ func (c *CategoryControllerImpl) GetAllCategory(ctx *fiber.Ctx) error {
 	categories, err := c.categoryUsc.GetAllCategory(ctx.Context())
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Category")
-		return helper.BuildResponse(ctx, false, "Failed to GET data", err.Err, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to GET data", err.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, categories, fiber.StatusOK)
@@ -63,7 +63,7 @@ func (c *CategoryControllerImpl) CreateCategory(ctx *fiber.Ctx) error {
 	category, errUsc := c.categoryUsc.CreateCategory(ctx.Context(), *data)
 	if errUsc != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Category")
-		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc.Err, nil, errUsc.Code)
+		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc.Err.Error(), nil, errUsc.Code)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, category, fiber.StatusCreated)
@@ -85,7 +85,7 @@ func (c *CategoryControllerImpl) UpdateCategoryByID(ctx *fiber.Ctx) error {
 	_, errUsc := c.categoryUsc.UpdateCategoryByID(ctx.Context(), uint(id), *data)
 	if errUsc != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Category By ID")
-		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errUsc.Err, nil, errUsc.Code)
+		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errUsc.Err.Error(), nil, errUsc.Code)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to UPDATE data", nil, "", fiber.StatusOK)
