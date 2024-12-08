@@ -12,16 +12,11 @@ import (
 )
 
 type ProvinceCityUseCase interface {
-	// ListProvincies(ctx context.Context, params dto.ListProvResp) (res dto.ListProvResp, err *helper.ErrorStruct)
 	GetAllProvinces(ctx context.Context, filter *dto.ProvinceFilter) (res []*dto.ProvinceResp, err *helper.ErrorStruct)
 	GetAllCitiesByProvinceID(ctx context.Context, provinceid string) (res []*dto.CityResp, err *helper.ErrorStruct)
 	GetProvinceByID(ctx context.Context, provinceid string) (res *dto.ProvinceResp, err *helper.ErrorStruct)
 	GetCityByID(ctx context.Context, cityid string) (res *dto.CityResp, err *helper.ErrorStruct)
 }
-
-// type provCityUseCaseImpl struct {
-// 	provinceCityRepository userrepository.UsersRepository
-// }
 
 type ProvinceCityUseCaseImpl struct {
 	provinceCityRepository repository.ProvinceCityRepository

@@ -3,10 +3,12 @@ package repository
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
+	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
-	// "gorm.io/gorm"
+	"tugas_akhir_example/internal/utils"
 )
 
 const provinceCityListProvinceAPI = "https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json"
@@ -16,16 +18,11 @@ const provinceCityDetailCityAPI = "https://emsifa.github.io/api-wilayah-indonesi
 
 
 type ProvinceCityRepository interface {
-	// ListProvincies(ctx context.Context) (res dto.ListProvResp, err error)
 	GetAllProvinces(ctx context.Context, limit, offset int, search string) (res []*dto.ProvinceResp, err error)
 	GetAllCitiesByProvinceID(ctx context.Context, provinceid string) (res []*dto.CityResp, err error)
 	GetProvinceByID(ctx context.Context, provinceid string) (res *dto.ProvinceResp, err error)
 	GetCityByID(ctx context.Context, cityid string) (res *dto.CityResp, err error)
 }
-
-// type provCityUseCaseImpl struct {
-// 	db *gorm.DB
-// }
 
 type ProvinceCityRepositoryImpl struct {
 }
@@ -37,12 +34,14 @@ func NewProvinceCityRepository() ProvinceCityRepository {
 func (alr *ProvinceCityRepositoryImpl) GetAllProvinces(ctx context.Context, limit, offset int, search string) (res []*dto.ProvinceResp, err error) {
 	resp, err := http.Get(provinceCityListProvinceAPI)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 
@@ -73,12 +72,14 @@ func (alr *ProvinceCityRepositoryImpl) GetAllProvinces(ctx context.Context, limi
 func (alr *ProvinceCityRepositoryImpl) GetAllCitiesByProvinceID(ctx context.Context, provinceid string) (res []*dto.CityResp, err error) {
 	resp, err := http.Get(strings.Replace(provinceCityListCityByProvinceAPI, "%s", provinceid, 1))
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 
@@ -88,12 +89,14 @@ func (alr *ProvinceCityRepositoryImpl) GetAllCitiesByProvinceID(ctx context.Cont
 func (alr *ProvinceCityRepositoryImpl) GetProvinceByID(ctx context.Context, provinceid string) (res *dto.ProvinceResp, err error) {
 	resp, err := http.Get(strings.Replace(provinceCityDetailProvinceAPI, "%s", provinceid, 1))
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 
@@ -103,12 +106,14 @@ func (alr *ProvinceCityRepositoryImpl) GetProvinceByID(ctx context.Context, prov
 func (alr *ProvinceCityRepositoryImpl) GetCityByID(ctx context.Context, cityid string) (res *dto.CityResp, err error) {
 	resp, err := http.Get(strings.Replace(provinceCityDetailCityAPI, "%s", cityid, 1))
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&res)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error : %s", err.Error()))
 		return nil, err
 	}
 

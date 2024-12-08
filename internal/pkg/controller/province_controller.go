@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/usecase"
@@ -43,29 +42,16 @@ func (uc *ProvinceCityControllerImpl) GetAllProvinces(ctx *fiber.Ctx) error {
 	err := ctx.QueryParser(filter)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, err.Error())
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{err.Error()},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to parse query params", err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	res, customErr := uc.provincecityusecase.GetAllProvinces(c, filter)
 	if customErr != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, customErr.Err.Error())
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: customErr.Code,
-			Errors:     []string{customErr.Err.Error()},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", customErr.Err, nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx:        ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       res,
-	})
-
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
 func (uc *ProvinceCityControllerImpl) GetAllCitiesByProvinceID(ctx *fiber.Ctx) error {
@@ -74,17 +60,13 @@ func (uc *ProvinceCityControllerImpl) GetAllCitiesByProvinceID(ctx *fiber.Ctx) e
 	provinceid := ctx.Params("prov_id")
 	if provinceid == "" {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Bad request")
-		fmt.Println("debug 1 allCityByProvinceID")
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{"Bad request"},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", "Bad request", nil, fiber.StatusBadRequest)
 	}
 
 	res, customErr := uc.provincecityusecase.GetAllCitiesByProvinceID(c, provinceid)
 	if customErr != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, customErr.Err.Error())
+		return helper.BuildResponse(ctx, false, "Failed to GET data", customErr.Err, nil, fiber.StatusBadRequest)
 	}
 
 	return helper.ResponseWithJSON(&helper.JSONRespArgs{
@@ -100,29 +82,16 @@ func (uc *ProvinceCityControllerImpl) GetProvinceByID(ctx *fiber.Ctx) error {
 	provinceid := ctx.Params("prov_id")
 	if provinceid == "" {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Bad request")
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{"Bad request"},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", "Bad request", nil, fiber.StatusBadRequest)
 	}
 
 	res, customErr := uc.provincecityusecase.GetProvinceByID(c, provinceid)
 	if customErr != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, customErr.Err.Error())
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors: []string{"Bad request"},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", customErr.Err, nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx: ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       res,
-	})
-	
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
 func (uc *ProvinceCityControllerImpl) GetCityByID(ctx *fiber.Ctx) error {
@@ -131,26 +100,14 @@ func (uc *ProvinceCityControllerImpl) GetCityByID(ctx *fiber.Ctx) error {
 	cityId := ctx.Params("city_id")
 	if cityId == "" {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Bad request")
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{"Bad request"},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", "Bad request", nil, fiber.StatusBadRequest)
 	}
 
 	res, customErr := uc.provincecityusecase.GetCityByID(c, cityId)
 	if customErr != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, customErr.Err.Error())
-		return helper.ResponseWithJSON(&helper.JSONRespArgs{
-			Ctx:        ctx,
-			StatusCode: fiber.StatusBadRequest,
-			Errors:     []string{"Bad request"},
-		})
+		return helper.BuildResponse(ctx, false, "Failed to GET data", customErr.Err, nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx: ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       res,
-	})
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
