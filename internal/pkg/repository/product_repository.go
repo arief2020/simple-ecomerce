@@ -3,9 +3,12 @@ package repository
 import (
 	"context"
 	"fmt"
+
 	// "fmt"
+	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
 	"tugas_akhir_example/internal/pkg/entity"
+	"tugas_akhir_example/internal/utils"
 
 	"gorm.io/gorm"
 )
@@ -31,28 +34,6 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 	}
 }
 
-// func (r *ProductRepositoryImpl) CreateProduct(ctx context.Context, data entity.Product, photo []entity.FotoProduct) (entity.Product, error) {
-
-// 	product := entity.Product{
-// 		NamaProduk: data.NamaProduk,
-// 		Deskripsi:  data.Deskripsi,
-// 		Slug:       data.Slug,
-// 		TokoID:     data.TokoID,
-// 		CategoryID: data.CategoryID,
-// 		HargaReseller: data.HargaReseller,
-// 		HargaKonsumen: data.HargaKonsumen,
-// 		Stok: data.Stok,
-// 		FotoProduct: photo,
-// 	}
-
-
-// 	if err := r.db.WithContext(ctx).Create(&product).Error; err != nil {
-// 		return data, err
-// 	}
-// 	return data, nil
-// }
-
-
 func (r *ProductRepositoryImpl) CreateProduct(ctx context.Context, data entity.Product) (entity.Product, error) {
     product := entity.Product{
         NamaProduk:    data.NamaProduk,
@@ -63,27 +44,12 @@ func (r *ProductRepositoryImpl) CreateProduct(ctx context.Context, data entity.P
         HargaReseller: data.HargaReseller,
         HargaKonsumen: data.HargaKonsumen,
         Stok:          data.Stok,
-        // FotoProduct:   photo, // Ini akan di-embed di dalam Product
     }
-
-//     for i := range product.FotoProduct {
-//     product.FotoProduct[i].ProductID = product.ID // Pastikan ID produk diatur dengan benar
-// }
-
 
     if err := r.db.WithContext(ctx).Create(&product).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
         return product, err
     }
-
-    //  // Set ProductID untuk setiap FotoProduct
-    // for i := range photos {
-    //     photos[i].ProductID = product.ID
-    // }
-
-    // // Simpan FotoProduct
-    // if err := r.db.WithContext(ctx).Create(&photos).Error; err != nil {
-    //     return product, err
-    // }
 
     return product, nil
 }
@@ -91,19 +57,11 @@ func (r *ProductRepositoryImpl) CreateProduct(ctx context.Context, data entity.P
 
 func (r *ProductRepositoryImpl) CreatePhotoProduct(ctx context.Context, data entity.FotoProduct) (entity.FotoProduct, error) {
     if err := r.db.WithContext(ctx).Create(&data).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Foto Product")
         return data, err
     }
     return data, nil
 }
-
-// func (r *ProductRepositoryImpl) GetAllProduct(ctx context.Context, params dto.AllProductFilter) ([]entity.Product, error) {
-//     var products []entity.Product
-//     if err := r.db.WithContext(ctx).Find(&products).Error; err != nil {
-//         return nil, err
-//     }
-//     return products, nil
-// }
-
 
 func (r *ProductRepositoryImpl) GetAllProduct(ctx context.Context, params dto.AllProductFilter) (res []dto.ProductResp, err error) {
     var products []entity.Product
@@ -146,6 +104,7 @@ func (r *ProductRepositoryImpl) GetAllProduct(ctx context.Context, params dto.Al
     }
 
     if err := query.Find(&products).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Product")
         return nil, err
     }
 
@@ -155,13 +114,6 @@ func (r *ProductRepositoryImpl) GetAllProduct(ctx context.Context, params dto.Al
     return res, nil
 }
 
-// func (r *ProductRepositoryImpl) GetProductByID(ctx context.Context, id uint) (res dto.ProductResp, err error) {
-//     var product entity.Product
-//     if err := r.db.WithContext(ctx).Where("id = ?", id).Joins("FotoProduct").First(&product).Error; err != nil {
-//         return res, err
-//     }
-//     return res, nil
-// }
 func mapToProductResp(product entity.Product) dto.ProductResp {
     fmt.Println(product)
     photos := []dto.PhotoProductResp{}
@@ -201,18 +153,19 @@ func (r *ProductRepositoryImpl) GetProductByID(ctx context.Context, id uint) (re
         Preload("Category").
         Where("id = ?", id).
         First(&product).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By ID")
         return res, err
     }
 
     fmt.Printf("Category: %+v", product.Category)
 
     res = mapToProductResp(product)
-    // fmt.Printf("res: %+v\n", res)
     return res, nil
 }
 
 func (r *ProductRepositoryImpl) UpdateProductByID(ctx context.Context, id uint, data entity.Product) (string, error) {
     if err := r.db.WithContext(ctx).Where("id = ?", id).Updates(&data).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Product")
         return "", err
     }
     return "Product updated successfully", nil
@@ -221,6 +174,7 @@ func (r *ProductRepositoryImpl) UpdateProductByID(ctx context.Context, id uint, 
 func (r *ProductRepositoryImpl) DeleteProductByID(ctx context.Context, id uint) (string, error) {
     var product entity.Product
     if err := r.db.WithContext(ctx).Where("id = ?", id).Delete(&product).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Delete Product")
         return "", err
     }
     return "Product deleted successfully", nil
@@ -228,6 +182,7 @@ func (r *ProductRepositoryImpl) DeleteProductByID(ctx context.Context, id uint) 
 
 func (r *ProductRepositoryImpl) CreateLogProduct(ctx context.Context, data entity.LogProduct) (entity.LogProduct, error) {
     if err := r.db.WithContext(ctx).Create(&data).Error; err != nil {
+        helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Log Product")
         return data, err
     }
     return data, nil

@@ -26,63 +26,71 @@ func NewProductController(productUsc usecase.ProductUseCase) ProductController {
 }
 
 func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
-	namaProduct := ctx.FormValue("nama_produk")
-		if namaProduct == "" {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Field 'nama_produk' is required",
-			})
-		}
+	// namaProduct := ctx.FormValue("nama_produk")
+	// 	if namaProduct == "" {
+	// 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Field 'nama_produk' is required")
+	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 			"error": "Field 'nama_produk' is required",
+	// 		})
+	// 	}
 		
-		categoryId := ctx.FormValue("category_id")
-		if categoryId == "" {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Field 'category_id' is required",
-			})
-		}
-		uintCategoryId := utils.StringToUint(categoryId)
+	// 	categoryId := ctx.FormValue("category_id")
+	// 	if categoryId == "" {
+	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 			"error": "Field 'category_id' is required",
+	// 		})
+	// 	}
+	// 	uintCategoryId := utils.StringToUint(categoryId)
 
-		hargaReseller := ctx.FormValue("harga_reseller")
-		if hargaReseller == "" {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Field 'harga_reseller' is required",
-			})
-		}
+	// 	hargaReseller := ctx.FormValue("harga_reseller")
+	// 	if hargaReseller == "" {
+	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 			"error": "Field 'harga_reseller' is required",
+	// 		})
+	// 	}
 
-		hargaKonsumen := ctx.FormValue("harga_konsumen")
-		if hargaKonsumen == "" {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Field 'harga_konsumen' is required",
-			})
-		}
+	// 	hargaKonsumen := ctx.FormValue("harga_konsumen")
+	// 	if hargaKonsumen == "" {
+	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 			"error": "Field 'harga_konsumen' is required",
+	// 		})
+	// 	}
 
-		stok := ctx.FormValue("stok")
-		if stok == "" {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Field 'stok' is required",
-			})
-		}
+	// 	stok := ctx.FormValue("stok")
+	// 	if stok == "" {
+	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 			"error": "Field 'stok' is required",
+	// 		})
+	// 	}
 
-		deskripsi := ctx.FormValue("deskripsi")
-		if deskripsi == "" {
-			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Field 'deskripsi' is required",
-			})
-		}
+	// 	deskripsi := ctx.FormValue("deskripsi")
+	// 	if deskripsi == "" {
+	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+	// 			"error": "Field 'deskripsi' is required",
+	// 		})
+	// 	}
+	data := new(dto.ProductCreateReq)
+	if err:= ctx.BodyParser(data); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
 
 		userId := ctx.Locals("userid").(string)
 		userIdInt := utils.StringToUint(userId)
 		
 		dataReq := &dto.ProductCreateReq {
-			NamaProduk:   namaProduct,
-			CategoryID:   uint(uintCategoryId),
-			HargaReseller: hargaReseller,
-			HargaKonsumen: hargaKonsumen,
-			Stok:         stok,
-			Deskripsi:    deskripsi,
+			NamaProduk:   data.NamaProduk,
+			CategoryID:   data.CategoryID,
+			HargaReseller: data.HargaReseller,
+			HargaKonsumen: data.HargaKonsumen,
+			Stok:         data.Stok,
+			Deskripsi:    data.Deskripsi,
 		}
 
 		files, err := ctx.MultipartForm()
 		if err != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Failed to parse multipart form")
 			return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"error": "Failed to parse multipart form",
 			})
@@ -92,6 +100,7 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 
 		resUsc, errUsc := c.productUsc.CreateProduct(ctx.Context(), *dataReq, photos, uint(userIdInt))
 		if errUsc != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
 			return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc, nil, fiber.StatusBadRequest)
 		}
 
@@ -101,6 +110,7 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 func (c *ProductControllerImpl) GetAllProduct(ctx *fiber.Ctx) error {
 	filter := new(dto.AllProductFilter)
 	if err := ctx.QueryParser(filter); err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse Request Query")
 		return helper.BuildResponse(ctx, false, "Failed to parse query params", err.Error(), nil, fiber.StatusBadRequest)
 	}
 	resUsc, errUsc := c.productUsc.GetAllProduct(ctx.Context(), dto.AllProductFilter{
@@ -113,6 +123,7 @@ func (c *ProductControllerImpl) GetAllProduct(ctx *fiber.Ctx) error {
 		Page: filter.Page,
 	})
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Product")
 		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc, nil, fiber.StatusBadRequest)
 	}
 
@@ -124,6 +135,7 @@ func (c *ProductControllerImpl) GetProductByID(ctx *fiber.Ctx) error {
 	productId := utils.StringToUint(id)
 	resUsc, errUsc := c.productUsc.GetProductByID(ctx.Context(), uint(productId))
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By ID")
 		return helper.BuildResponse(ctx, false, "Failed to GET data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
@@ -135,6 +147,7 @@ func (c *ProductControllerImpl) DeleteProductByID(ctx *fiber.Ctx) error {
 	productId := utils.StringToUint(id)
 	_, errUsc := c.productUsc.DeleteProductByID(ctx.Context(), uint(productId))
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Delete Product By ID")
 		return helper.BuildResponse(ctx, false, "Failed to DELETE data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
@@ -160,6 +173,7 @@ func (c *ProductControllerImpl) UpdateProductByID(ctx *fiber.Ctx) error {
 
 	_, errUsc := c.productUsc.UpdateProductByID(ctx.Context(), uint(productId), data)
 	if errUsc != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Product By ID")
 		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errUsc, nil, fiber.StatusBadRequest)
 	}
 

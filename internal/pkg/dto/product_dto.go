@@ -16,7 +16,7 @@ type AllProductResp struct {
 	Limit int `json:"limit"`
 }
 
-type ProductCreateReq struct {
+type OldProductCreateReq struct {
 	NamaProduk   string `json:"nama_produk" validate:"required"`
 	CategoryID   uint   `json:"id_category" validate:"required"`
 	HargaReseller string `json:"harga_reseller" validate:"required"`
@@ -24,7 +24,7 @@ type ProductCreateReq struct {
 	Stok         string `json:"stok" validate:"required"`
 	Deskripsi    string `json:"deskripsi" validate:"required"`
 }
-type EvaluasiProductCreateReq struct {
+type ProductCreateReq struct {
 	NamaProduk   string `form:"nama_produk" validate:"required"`
 	CategoryID   uint   `form:"id_category" validate:"required"`
 	HargaReseller string `form:"harga_reseller" validate:"required"`

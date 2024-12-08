@@ -39,11 +39,13 @@ func NewProductUseCase(productRepo repository.ProductRepository, tokoRepo reposi
 func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.ProductCreateReq,photos []*multipart.FileHeader, userId uint) (int, *helper.ErrorStruct) {
 	_, err := u.userRepo.GetUserById(ctx, userId)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By ID")
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
 	}
 
 	dataToko, err := u.tokoRepo.GetTokoByUserId(ctx, userId)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By User ID")
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
 	}
 
@@ -63,20 +65,15 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 	for _, photo := range photos {
 		uploadedPhoto, err := helper.UploadFile(photo, "uploads")
 		if err != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Upload File")
 			return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
 		}
 		pathUploadedPhotos = append(pathUploadedPhotos, uploadedPhoto)
 	}
 
-	// dataPhoto := []entity.FotoProduct{}
-	// for _, photo := range pathUploadedPhotos {
-	// 	dataPhoto = append(dataPhoto, entity.FotoProduct{
-	// 		UrlFoto: photo,
-	// 	})
-	// }
-
 	resCreateRepo, errRepo := u.productRepo.CreateProduct(ctx, dataReq)
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -85,9 +82,9 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 			UrlFoto: photo,
 			ProductID: resCreateRepo.ID,
 		}
-		// saran pakai insert many
 		_, errRepoPhoto := u.productRepo.CreatePhotoProduct(ctx, data)
 		if errRepoPhoto != nil {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Photo Product")
 			return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepoPhoto.Error())}
 		}
 	}
@@ -107,10 +104,6 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllPr
 		params.Page = (params.Page - 1) * params.Limit
 	}
 
-	// uintMaxHarga := utils.StringToUint(params.MaxHarga)
-
-	// uintMinHarga := utils.StringToUint(params.MinHarga)
-
 	resRepo, errRepo := u.productRepo.GetAllProduct(ctx, dto.AllProductFilter{
 		Limit:  params.Limit,
 		Page: params.Page,
@@ -121,6 +114,7 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllPr
 		MinHarga:  params.MinHarga,
 	})
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Product")
 		return nil, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -153,8 +147,10 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 	resRepo, errRepo := u.productRepo.GetProductByID(ctx, id)
 	if errRepo != nil {
 		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Product")
 			return nil, &helper.ErrorStruct{Code: fiber.StatusNotFound, Err: errors.New("no data product")}
 		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
 		return nil, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -175,9 +171,9 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 }
 
 func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, productReq dto.ProductUpdateReq) (string, *helper.ErrorStruct) {
-	// tambahkan kondisi harus product di toko sendiri
 	_, errRepo := u.productRepo.GetProductByID(ctx, id)
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -195,6 +191,7 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 
 	resUpdateRepo, errRepo := u.productRepo.UpdateProductByID(ctx, id, data)
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Product By Id")
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -203,14 +200,15 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 
 func (u *ProductUseCaseImpl) DeleteProductByID(ctx context.Context, productId uint) (string, *helper.ErrorStruct) {
 	
-	// tambahkan kondisi harus product di toko sendiri
 	_, errRepo := u.productRepo.GetProductByID(ctx, productId)
 	if errRepo != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
 	res, err := u.productRepo.DeleteProductByID(ctx, productId)
 	if err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Delete Product By Id")
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
 	}
 
