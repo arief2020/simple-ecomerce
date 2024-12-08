@@ -67,6 +67,7 @@ func (r *CategoryRepositoryImpl) DeleteCategoryByID(ctx context.Context, id uint
 	}
 
 	if err := r.db.WithContext(ctx).Where("id = ?", id).Delete(&entity.Category{}).Error; err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Delete Category")
 		return "", err
 	}
 	return "success", nil
