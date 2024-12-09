@@ -3,11 +3,12 @@ package mysql
 import (
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/entity"
+	// "tugas_akhir_example/internal/utils"
 
 	"gorm.io/gorm"
 )
 
-const currentfilepath = "internal/infrastructure/mysql/migration.go"
+// const currentfilepath = "internal/infrastructure/mysql/migration.go"
 
 func RunMigration(mysqlDB *gorm.DB) {
 	err := mysqlDB.AutoMigrate(
@@ -22,8 +23,8 @@ func RunMigration(mysqlDB *gorm.DB) {
 		&entity.DetailTrx{},
 	)
 	if err != nil {
-		// helper.Logger(helper.LoggerLevelError, "Failed Database Migrated", err)
-		helper.Logger(currentfilepath, helper.LoggerLevelError, "Failed Database Migrated")
+		helper.Logger(helper.LoggerLevelError, "Failed Database Migrated", err.Error())
+		// helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Failed Database Migrated")
 	}
 
 	// var count int64
@@ -34,6 +35,6 @@ func RunMigration(mysqlDB *gorm.DB) {
 	// 	}
 	// }
 
-	// helper.Logger(helper.LoggerLevelInfo, "Database Migrated", nil)
-	helper.Logger(currentfilepath, helper.LoggerLevelInfo, "Database Migrated")
+	helper.Logger(helper.LoggerLevelInfo, "Database Migrated", "")
+	// helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, "Database Migrated")
 }

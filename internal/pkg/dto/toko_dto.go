@@ -28,7 +28,7 @@ type TokoFilter struct {
 }
 
 type AllTokoResp struct {
-	Page  int        `query:"page"`
-	Limit int        `query:"limit"`
+	Page  int        `json:"page"`
+	Limit int        `json:"limit"`
 	Data  []TokoResp `json:"data"`
 }

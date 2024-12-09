@@ -26,7 +26,7 @@ type OldProductCreateReq struct {
 }
 type ProductCreateReq struct {
 	NamaProduk    string `form:"nama_produk" validate:"required"`
-	CategoryID    uint   `form:"id_category" validate:"required"`
+	CategoryID    uint   `form:"category_id" validate:"required"`
 	HargaReseller string `form:"harga_reseller" validate:"required"`
 	HargaKonsumen string `form:"harga_konsumen" validate:"required"`
 	Stok          string `form:"stok" validate:"required"`

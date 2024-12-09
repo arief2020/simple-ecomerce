@@ -3,6 +3,7 @@ package mysql
 import (
 	"fmt"
 	"tugas_akhir_example/internal/helper"
+	"tugas_akhir_example/internal/utils"
 
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -27,7 +28,7 @@ func DatabaseInit(v *viper.Viper) *gorm.DB {
 	err := v.Unmarshal(&mysqlConfig)
 	if err != nil {
 		// helper.Logger(helper.LoggerLevelPanic, fmt.Sprintf("failed init database mysql : %s", err.Error()), err)
-		helper.Logger(currentfilepath, helper.LoggerLevelPanic, fmt.Sprintf("failed init database mysql : %s", err.Error()))
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, fmt.Sprintf("failed init database mysql : %s", err.Error()))
 	}
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", mysqlConfig.Username, mysqlConfig.Password, mysqlConfig.Host, mysqlConfig.Port, mysqlConfig.DbName)
@@ -46,8 +47,8 @@ func DatabaseInit(v *viper.Viper) *gorm.DB {
 
 	// TODO POOLING CONNECTION
 
-	// helper.Logger(helper.LoggerLevelInfo, "⇨ MySQL status is connected", nil)
-	helper.Logger(currentfilepath, helper.LoggerLevelInfo, "⇨ MySQL status is connected")
+	helper.Logger(helper.LoggerLevelInfo, "⇨ MySQL status is connected", "")
+	// helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, "⇨ MySQL status is connected")
 	RunMigration(db)
 
 	return db
@@ -56,8 +57,8 @@ func DatabaseInit(v *viper.Viper) *gorm.DB {
 func CloseDatabaseConnection(db *gorm.DB) {
 	dbSQL, err := db.DB()
 	if err != nil {
-		// helper.Logger(helper.LoggerLevelPanic, fmt.Sprintf("Failed to close connection to database : %s", err.Error()), err)
-		helper.Logger(currentfilepath, helper.LoggerLevelPanic, fmt.Sprintf("Failed to close connection to database : %s", err.Error()))
+		helper.Logger(helper.LoggerLevelPanic, fmt.Sprintf("Failed to close connection to database : %s", err.Error()), err.Error())
+		// helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, fmt.Sprintf("Failed to close connection to database : %s", err.Error()))
 	}
 
 	dbSQL.Close()

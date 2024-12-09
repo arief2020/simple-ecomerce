@@ -103,7 +103,7 @@ func InitContainer() (cont *Container) {
 	provinceCityUsc := usecase.NewProvinceCityUseCase(provinceCityRepo)
 	tokoUsc := usecase.NewTokoUseCase(tokoRepo)
 	categoryUsc := usecase.NewCategoryUseCase(categoryRepo)
-	productUsc := usecase.NewProductUseCase(productRepo, tokoRepo, userRepo)
+	productUsc := usecase.NewProductUseCase(productRepo, tokoRepo, userRepo, categoryRepo)
 	trxUsc := usecase.NewTrxUseCase(trxRepo, userRepo, productRepo)
 
 	return &Container{

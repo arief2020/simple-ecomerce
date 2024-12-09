@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"fmt"
 	"mime/multipart"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/pkg/dto"
@@ -26,13 +27,15 @@ type ProductUseCaseImpl struct {
 	productRepo repository.ProductRepository
 	tokoRepo    repository.TokoRepository
 	userRepo    repository.UsersRepository
+	categoryRepo repository.CategoryRepository
 }
 
-func NewProductUseCase(productRepo repository.ProductRepository, tokoRepo repository.TokoRepository, userRepo repository.UsersRepository) ProductUseCase {
+func NewProductUseCase(productRepo repository.ProductRepository, tokoRepo repository.TokoRepository, userRepo repository.UsersRepository, categoryRepo repository.CategoryRepository) ProductUseCase {
 	return &ProductUseCaseImpl{
 		productRepo: productRepo,
 		tokoRepo:    tokoRepo,
 		userRepo:    userRepo,
+		categoryRepo: categoryRepo,
 	}
 }
 
@@ -42,6 +45,20 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By ID")
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(err.Error())}
 	}
+
+	_, errCategoryRepo := u.categoryRepo.GetCategoryByID(ctx, productReq.CategoryID)
+	if errCategoryRepo != nil {
+		if errors.Is(errCategoryRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Category Not Found")
+			return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New("category not found")}
+			
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Category By ID")
+		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errCategoryRepo.Error())}
+		
+	}
+
+	
 
 	dataToko, err := u.tokoRepo.GetTokoByUserId(ctx, userId)
 	if err != nil {
@@ -71,17 +88,22 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 		pathUploadedPhotos = append(pathUploadedPhotos, uploadedPhoto)
 	}
 
+
 	resCreateRepo, errRepo := u.productRepo.CreateProduct(ctx, dataReq)
 	if errRepo != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
+	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, fmt.Sprintf("Product ID : %v", resCreateRepo.ID))
+
 	for _, photo := range pathUploadedPhotos {
 		data := entity.FotoProduct{
 			UrlFoto:   photo,
 			ProductID: resCreateRepo.ID,
 		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, fmt.Sprintf("Photo Product : %v", data))
+
 		_, errRepoPhoto := u.productRepo.CreatePhotoProduct(ctx, data)
 		if errRepoPhoto != nil {
 			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Photo Product")
@@ -170,9 +192,29 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 }
 
 func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, productReq dto.ProductUpdateReq) (string, *helper.ErrorStruct) {
-	_, errRepo := u.productRepo.GetProductByID(ctx, id)
+	// _, errRepo := u.productRepo.GetProductByID(ctx, id)
+	// if errRepo != nil {
+	// 	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
+	// 	return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
+	// }
+
+	userId := ctx.Value("user_id").(string)
+	uintUser := utils.StringToUint(userId)
+
+	resToko, errToko := u.tokoRepo.GetTokoByUserId(ctx, uint(uintUser))
+	if errToko != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By Id")
+		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errToko.Error())}
+	}
+
+	_, errRepo := u.productRepo.GetMyProductById(ctx, uint(uintUser), resToko.ID, id)
 	if errRepo != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
+
+		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Product")
+			return "", &helper.ErrorStruct{Code: fiber.StatusNotFound, Err: errors.New("no data product")}
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Product By Id")
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
@@ -199,9 +241,29 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 
 func (u *ProductUseCaseImpl) DeleteProductByID(ctx context.Context, productId uint) (string, *helper.ErrorStruct) {
 
-	_, errRepo := u.productRepo.GetProductByID(ctx, productId)
+	// _, errRepo := u.productRepo.GetProductByID(ctx, productId)
+	// if errRepo != nil {
+	// 	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
+	// 	return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
+	// }
+
+	userId := ctx.Value("user_id").(string)
+	uintUser := utils.StringToUint(userId)
+
+	resToko, errToko := u.tokoRepo.GetTokoByUserId(ctx, uint(uintUser))
+	if errToko != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Toko By Id")
+		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errToko.Error())}
+	}
+
+	_, errRepo := u.productRepo.GetMyProductById(ctx, uint(uintUser), resToko.ID, productId)
 	if errRepo != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By Id")
+
+		if errors.Is(errRepo, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Product")
+			return "", &helper.ErrorStruct{Code: fiber.StatusNotFound, Err: errors.New("no data product")}
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Product By Id")
 		return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 

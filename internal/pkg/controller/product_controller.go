@@ -26,49 +26,6 @@ func NewProductController(productUsc usecase.ProductUseCase) ProductController {
 }
 
 func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
-	// namaProduct := ctx.FormValue("nama_produk")
-	// 	if namaProduct == "" {
-	// 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Field 'nama_produk' is required")
-	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 			"error": "Field 'nama_produk' is required",
-	// 		})
-	// 	}
-
-	// 	categoryId := ctx.FormValue("category_id")
-	// 	if categoryId == "" {
-	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 			"error": "Field 'category_id' is required",
-	// 		})
-	// 	}
-	// 	uintCategoryId := utils.StringToUint(categoryId)
-
-	// 	hargaReseller := ctx.FormValue("harga_reseller")
-	// 	if hargaReseller == "" {
-	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 			"error": "Field 'harga_reseller' is required",
-	// 		})
-	// 	}
-
-	// 	hargaKonsumen := ctx.FormValue("harga_konsumen")
-	// 	if hargaKonsumen == "" {
-	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 			"error": "Field 'harga_konsumen' is required",
-	// 		})
-	// 	}
-
-	// 	stok := ctx.FormValue("stok")
-	// 	if stok == "" {
-	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 			"error": "Field 'stok' is required",
-	// 		})
-	// 	}
-
-	// 	deskripsi := ctx.FormValue("deskripsi")
-	// 	if deskripsi == "" {
-	// 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-	// 			"error": "Field 'deskripsi' is required",
-	// 		})
-	// 	}
 	data := new(dto.ProductCreateReq)
 	if err := ctx.BodyParser(data); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -101,7 +58,7 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 	resUsc, errUsc := c.productUsc.CreateProduct(ctx.Context(), *dataReq, photos, uint(userIdInt))
 	if errUsc != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Product")
-		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, resUsc, fiber.StatusOK)

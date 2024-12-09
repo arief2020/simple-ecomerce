@@ -13,11 +13,9 @@ type Product struct {
 	Deskripsi     string `gorm:"type:text" json:"deskripsi" validate:"required"`
 	TokoID        uint   `gorm:"type:uint;column:id_toko" json:"id_toko" validate:"required"`
 	CategoryID    uint   `gorm:"type:uint;column:id_category" json:"id_category" validate:"required"`
+	
 	FotoProduct   []FotoProduct
 	Category      Category `gorm:"foreignKey:CategoryID"`
 	Toko          Toko
 
-	// CreatedAt time.Time      `gorm:"autoCreateTime" json:"created_at"`
-	// UpdatedAt time.Time      `gorm:"autoUpdateTime" json:"updated_at"`
-	// DeletedAt gorm.DeletedAt `gorm:"-" json:"deleted_at"`
 }

@@ -22,6 +22,8 @@ type ProductRepository interface {
 	GetProductByID(ctx context.Context, id uint) (res dto.ProductResp, err error)
 	UpdateProductByID(ctx context.Context, id uint, data entity.Product) (string, error)
 	DeleteProductByID(ctx context.Context, id uint) (string, error)
+
+	GetMyProductById(ctx context.Context, userId uint, tokoId uint, productId uint) (res entity.Product, err error)
 }
 
 type ProductRepositoryImpl struct {
@@ -185,4 +187,12 @@ func (r *ProductRepositoryImpl) CreateLogProduct(ctx context.Context, data entit
 		return data, err
 	}
 	return data, nil
+}
+
+func (r *ProductRepositoryImpl) GetMyProductById(ctx context.Context, userId uint, tokoId uint, productId uint) (res entity.Product, err error) {
+	if err := r.db.WithContext(ctx).Where("id = ?", productId).Where("id_toko = ?", tokoId).Where("id_user = ?", userId).First(&res).Error; err != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Product By ID")
+		return res, err
+	}
+	return res, nil
 }
