@@ -130,7 +130,7 @@ func (c *ProductControllerImpl) UpdateProductByID(ctx *fiber.Ctx) error {
 	_, errUsc := c.productUsc.UpdateProductByID(ctx.Context(), uint(productId), data)
 	if errUsc != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Update Product By ID")
-		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errUsc, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to UPDATE data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to UPDATE data", nil, "", fiber.StatusOK)

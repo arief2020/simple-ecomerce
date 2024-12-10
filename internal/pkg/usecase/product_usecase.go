@@ -198,7 +198,7 @@ func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, pro
 	// 	return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	// }
 
-	userId := ctx.Value("user_id").(string)
+	userId := ctx.Value("userid").(string)
 	uintUser := utils.StringToUint(userId)
 
 	resToko, errToko := u.tokoRepo.GetTokoByUserId(ctx, uint(uintUser))
@@ -247,7 +247,7 @@ func (u *ProductUseCaseImpl) DeleteProductByID(ctx context.Context, productId ui
 	// 	return "", &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	// }
 
-	userId := ctx.Value("user_id").(string)
+	userId := ctx.Value("userid").(string)
 	uintUser := utils.StringToUint(userId)
 
 	resToko, errToko := u.tokoRepo.GetTokoByUserId(ctx, uint(uintUser))

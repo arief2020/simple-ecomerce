@@ -190,7 +190,7 @@ func (r *ProductRepositoryImpl) CreateLogProduct(ctx context.Context, data entit
 }
 
 func (r *ProductRepositoryImpl) GetMyProductById(ctx context.Context, userId uint, tokoId uint, productId uint) (res entity.Product, err error) {
-	if err := r.db.WithContext(ctx).Where("id = ?", productId).Where("id_toko = ?", tokoId).Where("id_user = ?", userId).First(&res).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where("id = ?", productId).Where("id_toko = ?", tokoId).First(&res).Error; err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Product By ID")
 		return res, err
 	}
