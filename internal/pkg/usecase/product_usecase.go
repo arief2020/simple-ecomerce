@@ -131,7 +131,7 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllPr
 		NamaProduk: params.NamaProduk,
 		CategoryID: params.CategoryID,
 		TokoID:     params.TokoID,
-		MaxHarga:   params.MinHarga,
+		MaxHarga:   params.MaxHarga,
 		MinHarga:   params.MinHarga,
 	})
 	if errRepo != nil {
@@ -140,19 +140,8 @@ func (u *ProductUseCaseImpl) GetAllProduct(ctx context.Context, params dto.AllPr
 	}
 
 	data := []dto.ProductResp{}
-	for _, product := range resRepo {
-		data = append(data, dto.ProductResp{
-			ID:            product.ID,
-			NamaProduk:    product.NamaProduk,
-			Slug:          product.Slug,
-			HargaReseller: product.HargaReseller,
-			HargaKonsumen: product.HargaKonsumen,
-			Stok:          product.Stok,
-			Deskripsi:     product.Deskripsi,
-			Toko:          product.Toko,
-			Category:      product.Category,
-			Photos:        product.Photos,
-		})
+	for i := range resRepo {
+		data = append(data, mapToProductResp(resRepo[i]))
 	}
 
 	resp := &dto.AllProductResp{
@@ -175,20 +164,56 @@ func (u *ProductUseCaseImpl) GetProductByID(ctx context.Context, id uint) (*dto.
 		return nil, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errRepo.Error())}
 	}
 
+	helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelInfo, fmt.Sprintf("Product ID : %v", resRepo.ID))
+
+	dataResp := mapToProductResp(resRepo)
+
 	data := dto.ProductResp{
-		ID:            resRepo.ID,
-		NamaProduk:    resRepo.NamaProduk,
-		Slug:          resRepo.Slug,
-		HargaReseller: resRepo.HargaReseller,
-		HargaKonsumen: resRepo.HargaKonsumen,
-		Stok:          resRepo.Stok,
-		Deskripsi:     resRepo.Deskripsi,
-		Toko:          resRepo.Toko,
-		Category:      resRepo.Category,
-		Photos:        resRepo.Photos,
+		ID:            dataResp.ID,
+		NamaProduk:    dataResp.NamaProduk,
+		Slug:          dataResp.Slug,
+		HargaReseller: dataResp.HargaReseller,
+		HargaKonsumen: dataResp.HargaKonsumen,
+		Stok:          dataResp.Stok,
+		Deskripsi:     dataResp.Deskripsi,
+		Toko:          dataResp.Toko,
+		Category:      dataResp.Category,
+		Photos:        dataResp.Photos,
 	}
 
 	return &data, nil
+}
+
+func mapToProductResp(product entity.Product) dto.ProductResp {
+	fmt.Println(product)
+	photos := []dto.PhotoProductResp{}
+	for _, photo := range product.FotoProduct {
+		photos = append(photos, dto.PhotoProductResp{
+			Id:        photo.ID,
+			ProductID: photo.ProductID,
+			Url:       photo.UrlFoto,
+		})
+	}
+
+	return dto.ProductResp{
+		ID:            product.ID,
+		NamaProduk:    product.NamaProduk,
+		Slug:          product.Slug,
+		HargaReseller: product.HargaReseller,
+		HargaKonsumen: product.HargaKonsumen,
+		Stok:          product.Stok,
+		Deskripsi:     product.Deskripsi,
+		Toko: dto.TokoResp{
+			ID:       product.Toko.ID,
+			NamaToko: product.Toko.NamaToko,
+			UrlFoto:  product.Toko.UrlFoto,
+		},
+		Category: dto.CategoryResp{
+			ID:           product.Category.ID,
+			NamaCategory: product.Category.NamaCategory,
+		},
+		Photos: photos,
+	}
 }
 
 func (u *ProductUseCaseImpl) UpdateProductByID(ctx context.Context, id uint, productReq dto.ProductUpdateReq) (string, *helper.ErrorStruct) {
