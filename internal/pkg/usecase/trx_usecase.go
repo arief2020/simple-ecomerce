@@ -26,22 +26,47 @@ type TrxUseCaseImpl struct {
 	trxRepo     repository.TrxRepository
 	userRepo    repository.UsersRepository
 	productRepo repository.ProductRepository
+	db          *gorm.DB
 }
 
-func NewTrxUseCase(trxRepo repository.TrxRepository, userRepo repository.UsersRepository, productRepo repository.ProductRepository) TrxUseCase {
+func NewTrxUseCase(trxRepo repository.TrxRepository, userRepo repository.UsersRepository, productRepo repository.ProductRepository, db *gorm.DB) TrxUseCase {
 	return &TrxUseCaseImpl{
 		trxRepo:     trxRepo,
 		userRepo:    userRepo,
 		productRepo: productRepo,
+		db:          db,
 	}
 }
 
 func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRequest, userId uint) (int, *helper.ErrorStruct) {
 	_, err := t.userRepo.GetUserById(ctx, userId)
 	if err != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get User By ID")
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found User")
+			return 0, &helper.ErrorStruct{
+				Err:  errors.New("user not found"),
+				Code: fiber.StatusNotFound,
+			}
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get User By ID")
 		return 0, &helper.ErrorStruct{
 			Err:  err,
+			Code: fiber.StatusBadRequest,
+		}
+	}
+
+	_, errAlamat := t.userRepo.GetMyAlamatById(ctx, userId, uint(trxDto.AlamatKirim))
+	if errAlamat != nil {
+		if errors.Is(errAlamat, gorm.ErrRecordNotFound) {
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found Alamat")
+			return 0, &helper.ErrorStruct{
+				Err:  errors.New("alamat not found"),
+				Code: fiber.StatusNotFound,
+			}
+		}
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get My Alamat By ID")
+		return 0, &helper.ErrorStruct{
+			Err:  errAlamat,
 			Code: fiber.StatusBadRequest,
 		}
 	}
@@ -49,10 +74,13 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 	dataDetailsTrx := []entity.DetailTrx{}
 	trxTotal := 0
 
+	tx := t.db.Begin()
+
 	for _, detailTrx := range trxDto.DetailTrx {
 		resRepoProduct, errRepoProduct := t.productRepo.GetProductByID(ctx, uint(detailTrx.ProductID))
 		if errRepoProduct != nil {
-			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get Product By ID")
+			tx.Rollback()
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Product By ID")
 			return 0, &helper.ErrorStruct{
 				Err:  errRepoProduct,
 				Code: fiber.StatusBadRequest,
@@ -60,6 +88,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 		}
 		intStock := utils.StringToUint(resRepoProduct.Stok)
 		if int(intStock) < detailTrx.Kuantitas {
+			tx.Rollback()
 			return 0, &helper.ErrorStruct{
 				Err:  errRepoProduct,
 				Code: fiber.StatusBadRequest,
@@ -80,7 +109,8 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 		resRepoLogProduct, errRepoLogProduct := t.productRepo.CreateLogProduct(ctx, dataLogProduct)
 		if errRepoLogProduct != nil {
-			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Log Product")
+			tx.Rollback()
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Log Product")
 			return 0, &helper.ErrorStruct{
 				Err:  errRepoLogProduct,
 				Code: fiber.StatusBadRequest,
@@ -106,6 +136,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 	dataTrx := &entity.Trx{
 		UserID:      userId,
+		// AlamatID:    uint(trxDto.AlamatKirim),
 		AlamatID:    uint(trxDto.AlamatKirim),
 		HargaTotal:  trxTotal,
 		KodeInvoice: fmt.Sprintf("INV-%d", time.Now().UnixNano()),
@@ -114,7 +145,8 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 	resRepoTrx, errRepoTrx := t.trxRepo.CreateTrx(ctx, *dataTrx)
 	if errRepoTrx != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Trx")
+		tx.Rollback()
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Trx")
 		return 0, &helper.ErrorStruct{
 			Err:  errRepoTrx,
 			Code: fiber.StatusBadRequest,
@@ -126,13 +158,16 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 
 		_, errRepoDetailTrx := t.trxRepo.CreateDetailTrx(ctx, detailTrx)
 		if errRepoDetailTrx != nil {
-			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Create Detail Trx")
+			tx.Rollback()
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Detail Trx")
 			return 0, &helper.ErrorStruct{
 				Err:  errRepoDetailTrx,
 				Code: fiber.StatusBadRequest,
 			}
 		}
 	}
+
+	tx.Commit()
 	return int(resRepoTrx.ID), nil
 }
 
@@ -140,13 +175,13 @@ func (t *TrxUseCaseImpl) GetTransactionByID(ctx context.Context, trxId uint, use
 	resRepoTrx, errRepoTrx := t.trxRepo.GetTrxByID(ctx, trxId, userId)
 	if errRepoTrx != nil {
 		if errors.Is(errRepoTrx, gorm.ErrRecordNotFound) {
-			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Transaction Not Found")
+			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Transaction Not Found")
 			return nil, &helper.ErrorStruct{
 				Err:  errors.New("transaction not found"),
 				Code: fiber.StatusNotFound,
 			}
 		}
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelPanic, "Error Get Trx By ID")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Trx By ID")
 
 		return nil, &helper.ErrorStruct{
 			Err:  errRepoTrx,

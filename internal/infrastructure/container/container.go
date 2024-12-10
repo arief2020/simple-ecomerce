@@ -104,7 +104,7 @@ func InitContainer() (cont *Container) {
 	tokoUsc := usecase.NewTokoUseCase(tokoRepo)
 	categoryUsc := usecase.NewCategoryUseCase(categoryRepo)
 	productUsc := usecase.NewProductUseCase(productRepo, tokoRepo, userRepo, categoryRepo)
-	trxUsc := usecase.NewTrxUseCase(trxRepo, userRepo, productRepo)
+	trxUsc := usecase.NewTrxUseCase(trxRepo, userRepo, productRepo, mysqldb)
 
 	return &Container{
 		Apps:            &apps,

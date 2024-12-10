@@ -21,5 +21,5 @@ type LogProduct struct {
 	Product     *Product        `json:"product"`
 	Category    *Category       `json:"category"`
 	Toko        *Toko           `json:"toko"`
-	FotoProduct []*FotoProduct `gorm:"foreignKey:ProductID;references:ProductID" json:"foto_product"`
+	// FotoProduct []*FotoProduct `gorm:"foreignKey:ProductID;references:ProductID" json:"foto_product"`
 }

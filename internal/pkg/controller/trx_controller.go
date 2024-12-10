@@ -38,7 +38,7 @@ func (t *TrxControllerImpl) CreateTransction(ctx *fiber.Ctx) error {
 
 	if errUsc != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Create Transaction")
-		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc, nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to CREATE data", errUsc.Err.Error(), nil, fiber.StatusBadRequest)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, resUsc, fiber.StatusCreated)
