@@ -68,11 +68,12 @@ func (uc *ProvinceCityControllerImpl) GetAllCitiesByProvinceID(ctx *fiber.Ctx) e
 		return helper.BuildResponse(ctx, false, "Failed to GET data", customErr.Err, nil, fiber.StatusBadRequest)
 	}
 
-	return helper.ResponseWithJSON(&helper.JSONRespArgs{
-		Ctx:        ctx,
-		StatusCode: fiber.StatusOK,
-		Data:       res,
-	})
+	// return helper.ResponseWithJSON(&helper.JSONRespArgs{
+	// 	Ctx:        ctx,
+	// 	StatusCode: fiber.StatusOK,
+	// 	Data:       res,
+	// })
+	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
 func (uc *ProvinceCityControllerImpl) GetProvinceByID(ctx *fiber.Ctx) error {

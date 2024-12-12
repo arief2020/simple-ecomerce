@@ -1,0 +1,177 @@
+basePath: /api/v1
+definitions:
+  dto.CityResp:
+    description: Data kota yang terkait dengan user
+    properties:
+      id:
+        example: "1"
+        type: string
+      name:
+        example: Bandung
+        type: string
+      province_id:
+        example: "1"
+        type: string
+    type: object
+  dto.CreateUser:
+    properties:
+      email:
+        type: string
+      id_kota:
+        type: string
+      id_provinsi:
+        type: string
+      jenis_kelamin:
+        type: string
+      kata_sandi:
+        type: string
+      name:
+        type: string
+      no_telp:
+        type: string
+      pekerjaan:
+        type: string
+      tanggal_lahir:
+        type: string
+      tentang:
+        type: string
+    required:
+    - email
+    - id_kota
+    - id_provinsi
+    - jenis_kelamin
+    - kata_sandi
+    - name
+    - no_telp
+    - pekerjaan
+    - tanggal_lahir
+    - tentang
+    type: object
+  dto.Login:
+    properties:
+      kata_sandi:
+        type: string
+      no_telp:
+        type: string
+    required:
+    - kata_sandi
+    - no_telp
+    type: object
+  dto.LoginRes:
+    description: Data yang dikembalikan setelah user berhasil login
+    properties:
+      email:
+        example: L2DQK@example.com
+        type: string
+      id_kota:
+        $ref: '#/definitions/dto.CityResp'
+      id_provinsi:
+        $ref: '#/definitions/dto.ProvinceResp'
+      nama:
+        example: John Doe
+        type: string
+      no_telp:
+        example: "1234567890"
+        type: string
+      pekerjaan:
+        example: Software Engineer
+        type: string
+      tanggal_lahir:
+        example: "1990-01-01"
+        type: string
+      tentang:
+        example: Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  dto.ProvinceResp:
+    description: Data provinsi yang terkait dengan user
+    properties:
+      id:
+        example: "1"
+        type: string
+      name:
+        example: Jawa Barat
+        type: string
+    type: object
+  helper.Response:
+    properties:
+      data: {}
+      errors:
+        items: {}
+        type: array
+      message:
+        type: string
+      status:
+        type: boolean
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: fiber@swagger.io
+    name: API Support
+  description: Golang GoFiber swagger auto generate step by step by swaggo
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: GoFiber Example API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint untuk login user dan mengembalikan data user beserta token
+      parameters:
+      - description: Login User
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to POST data
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.LoginRes'
+              type: object
+      summary: Login User
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Endpoint untuk register user
+      parameters:
+      - description: Register User
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Berhasil login, mengembalikan data user
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: Register User
+      tags:
+      - Auth
+swagger: "2.0"
