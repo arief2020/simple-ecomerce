@@ -1,16 +1,21 @@
 basePath: /api/v1
 definitions:
   dto.AlamatResp:
+    description: Data that will be returned in the response
     properties:
       detail_alamat:
+        example: Jl. Contoh No. 123
         type: string
       id:
         type: integer
       judul_alamat:
+        example: Alamat Rumah
         type: string
       nama_penerima:
+        example: Budi
         type: string
       no_telp:
+        example: "08123456789"
         type: string
     required:
     - detail_alamat
@@ -66,17 +71,20 @@ definitions:
     - tentang
     type: object
   dto.InserAlamatReq:
+    description: Data that will be used to insert a new address
     properties:
       detail_alamat:
+        example: Jl. Contoh No. 123
         type: string
       judul_alamat:
+        example: Alamat Rumah
         type: string
       nama_penerima:
+        example: Budi
         type: string
       no_telp:
+        example: "08123456789"
         type: string
-      userId:
-        type: integer
     required:
     - detail_alamat
     - judul_alamat
@@ -133,15 +141,17 @@ definitions:
         type: string
     type: object
   dto.UpdateAlamatReq:
+    description: Data that will be used to update an address
     properties:
       detail_alamat:
+        example: Jl. Contoh No. 123
         type: string
       nama_penerima:
+        example: Budi
         type: string
       no_telp:
+        example: "08123456789"
         type: string
-      userId:
-        type: integer
     required:
     - detail_alamat
     - nama_penerima
@@ -332,6 +342,11 @@ paths:
       consumes:
       - application/json
       description: Endpoint for get all my address
+      parameters:
+      - description: Judul Alamat
+        in: query
+        name: judul_alamat
+        type: string
       produces:
       - application/json
       responses:

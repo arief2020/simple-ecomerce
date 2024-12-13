@@ -94,6 +94,7 @@ func (uc *UserControllerImpl) UpdateMyProfile(ctx *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
+// @Param judul_alamat query string false "Judul Alamat"
 // @Success 200 {object} helper.Response{data=[]dto.AlamatResp} "Succeed to get all my address"
 // @Router /user/alamat [get]
 func (uc *UserControllerImpl) GetMyAlamat(ctx *fiber.Ctx) error {

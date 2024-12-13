@@ -222,6 +222,14 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Get My Alamat",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Judul Alamat",
+                        "name": "judul_alamat",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Succeed to get all my address",
@@ -451,6 +459,7 @@ const docTemplate = `{
     },
     "definitions": {
         "dto.AlamatResp": {
+            "description": "Data that will be returned in the response",
             "type": "object",
             "required": [
                 "detail_alamat",
@@ -460,19 +469,23 @@ const docTemplate = `{
             ],
             "properties": {
                 "detail_alamat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jl. Contoh No. 123"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "judul_alamat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Alamat Rumah"
                 },
                 "nama_penerima": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Budi"
                 },
                 "no_telp": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "08123456789"
                 }
             }
         },
@@ -542,6 +555,7 @@ const docTemplate = `{
             }
         },
         "dto.InserAlamatReq": {
+            "description": "Data that will be used to insert a new address",
             "type": "object",
             "required": [
                 "detail_alamat",
@@ -551,19 +565,20 @@ const docTemplate = `{
             ],
             "properties": {
                 "detail_alamat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jl. Contoh No. 123"
                 },
                 "judul_alamat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Alamat Rumah"
                 },
                 "nama_penerima": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Budi"
                 },
                 "no_telp": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
+                    "type": "string",
+                    "example": "08123456789"
                 }
             }
         },
@@ -637,6 +652,7 @@ const docTemplate = `{
             }
         },
         "dto.UpdateAlamatReq": {
+            "description": "Data that will be used to update an address",
             "type": "object",
             "required": [
                 "detail_alamat",
@@ -645,16 +661,16 @@ const docTemplate = `{
             ],
             "properties": {
                 "detail_alamat": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jl. Contoh No. 123"
                 },
                 "nama_penerima": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Budi"
                 },
                 "no_telp": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "integer"
+                    "type": "string",
+                    "example": "08123456789"
                 }
             }
         },
