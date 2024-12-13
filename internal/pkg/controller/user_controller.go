@@ -31,6 +31,14 @@ func NewUserController(userUsc usecase.UserUseCase) UserController {
 	}
 }
 
+// @Summary Get My Profile
+// @Description Endpoint for get my profile
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} helper.Response{data=dto.UserResp} "Succeed to get my profile"
+// @Router /user [get]
 func (uc *UserControllerImpl) GetMyProfile(ctx *fiber.Ctx) error {
 	idStr := ctx.Locals("userid").(string)
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -48,6 +56,15 @@ func (uc *UserControllerImpl) GetMyProfile(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, user, fiber.StatusOK)
 }
 
+// @Summary Update My Profile
+// @Description Endpoint for get my profile
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param update-profile body dto.UpdateUser true "Update My Profile"
+// @Success 200 {object} helper.Response{data=string} "Succeed to update my profile"
+// @Router /user [put]
 func (uc *UserControllerImpl) UpdateMyProfile(ctx *fiber.Ctx) error {
 	idStr := ctx.Locals("userid").(string)
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -71,6 +88,14 @@ func (uc *UserControllerImpl) UpdateMyProfile(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, res, nil, "", fiber.StatusOK)
 }
 
+// @Summary Get My Alamat
+// @Description Endpoint for get all my address
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} helper.Response{data=[]dto.AlamatResp} "Succeed to get all my address"
+// @Router /user/alamat [get]
 func (uc *UserControllerImpl) GetMyAlamat(ctx *fiber.Ctx) error {
 	idStr := ctx.Locals("userid").(string)
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -99,9 +124,18 @@ func (uc *UserControllerImpl) GetMyAlamat(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
+// @Summary Create My New Alamat
+// @Description Endpoint for create new address
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param update-profile body dto.InserAlamatReq true "Success to create new address"
+// @Success 200 {object} helper.Response{data=int} "Succeed to create new address"
+// @Router /user/alamat [post]
 func (uc *UserControllerImpl) CreateMyNewAlamat(ctx *fiber.Ctx) error {
-	idStr := ctx.Locals("userid").(string)      // Ambil ID sebagai string
-	id, err := strconv.ParseUint(idStr, 10, 32) // Konversi string ke uint
+	idStr := ctx.Locals("userid").(string)
+	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Parse User ID")
 		return helper.BuildResponse(ctx, false, "Invalid user ID", err.Error(), nil, fiber.StatusBadRequest)
@@ -122,6 +156,15 @@ func (uc *UserControllerImpl) CreateMyNewAlamat(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to POST data", nil, res, fiber.StatusCreated)
 }
 
+// @Summary Get My Alamat By ID
+// @Description Endpoint for get address by id
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "ID of the address"
+// @Success 200 {object} helper.Response{data=dto.AlamatResp} "Succeed to get address by id"
+// @Router /user/alamat/{id} [get]
 func (uc *UserControllerImpl) GetMyAlamatById(ctx *fiber.Ctx) error {
 	idStr := ctx.Locals("userid").(string)
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -145,6 +188,16 @@ func (uc *UserControllerImpl) GetMyAlamatById(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
+// @Summary Get My Alamat By ID
+// @Description Endpoint for get address by id
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "ID of the address"
+// @Param update-alamat body dto.UpdateAlamatReq true "Success to update address"
+// @Success 200 {object} helper.Response{data=dto.AlamatResp} "Succeed to update address by id"
+// @Router /user/alamat/{id} [put]
 func (uc *UserControllerImpl) UpdateMyAlamatById(ctx *fiber.Ctx) error {
 	idStr := ctx.Locals("userid").(string)
 	id, err := strconv.ParseUint(idStr, 10, 32)
@@ -174,6 +227,15 @@ func (uc *UserControllerImpl) UpdateMyAlamatById(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, res, nil, "", fiber.StatusOK)
 }
 
+// @Summary Delete My Alamat By ID
+// @Description Endpoint for delete address by id
+// @Tags User
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "ID of the address"
+// @Success 200 {object} helper.Response{data=string} "Succeed to update address by id"
+// @Router /user/alamat/{id} [delete]
 func (uc *UserControllerImpl) DeleteMyAlamatById(ctx *fiber.Ctx) error {
 	idStr := ctx.Locals("userid").(string)
 	id, err := strconv.ParseUint(idStr, 10, 32)

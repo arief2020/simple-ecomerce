@@ -61,13 +61,6 @@ func (uc *AuthControllerImpl) Login(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param register body dto.CreateUser true "Register User"
 // @Success 200 {object} helper.Response{data=string} "Berhasil login, mengembalikan data user"
-// @Example {json} Success-Example:
-// {
-//     "status": true,
-//     "message": "success-update-data",
-//     "errors": null,
-//     "data": "Register Succeed"
-// }
 // @Router /auth/register [post]
 func (uc *AuthControllerImpl) Register(ctx *fiber.Ctx) error {
 

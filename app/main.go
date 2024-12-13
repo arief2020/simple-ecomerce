@@ -27,6 +27,9 @@ const currentfilepath = "app/main.go"
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 // @host localhost:8000
 // @BasePath /api/v1
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name token
 func main() {
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 

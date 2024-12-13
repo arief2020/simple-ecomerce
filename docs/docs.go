@@ -114,9 +114,368 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get my profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get My Profile",
+                "responses": {
+                    "200": {
+                        "description": "Succeed to get my profile",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.UserResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get my profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update My Profile",
+                "parameters": [
+                    {
+                        "description": "Update My Profile",
+                        "name": "update-profile",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succeed to update my profile",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/alamat": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get all my address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get My Alamat",
+                "responses": {
+                    "200": {
+                        "description": "Succeed to get all my address",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.AlamatResp"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for create new address",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create My New Alamat",
+                "parameters": [
+                    {
+                        "description": "Success to create new address",
+                        "name": "update-profile",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.InserAlamatReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succeed to create new address",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/user/alamat/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get address by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get My Alamat By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the address",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succeed to get address by id",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AlamatResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get address by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get My Alamat By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the address",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Success to update address",
+                        "name": "update-alamat",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateAlamatReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succeed to update address by id",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.AlamatResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for delete address by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete My Alamat By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID of the address",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succeed to update address by id",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "dto.AlamatResp": {
+            "type": "object",
+            "required": [
+                "detail_alamat",
+                "judul_alamat",
+                "nama_penerima",
+                "no_telp"
+            ],
+            "properties": {
+                "detail_alamat": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "judul_alamat": {
+                    "type": "string"
+                },
+                "nama_penerima": {
+                    "type": "string"
+                },
+                "no_telp": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CityResp": {
             "description": "Data kota yang terkait dengan user",
             "type": "object",
@@ -179,6 +538,32 @@ const docTemplate = `{
                 },
                 "tentang": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.InserAlamatReq": {
+            "type": "object",
+            "required": [
+                "detail_alamat",
+                "judul_alamat",
+                "nama_penerima",
+                "no_telp"
+            ],
+            "properties": {
+                "detail_alamat": {
+                    "type": "string"
+                },
+                "judul_alamat": {
+                    "type": "string"
+                },
+                "nama_penerima": {
+                    "type": "string"
+                },
+                "no_telp": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         },
@@ -251,6 +636,103 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateAlamatReq": {
+            "type": "object",
+            "required": [
+                "detail_alamat",
+                "nama_penerima",
+                "no_telp"
+            ],
+            "properties": {
+                "detail_alamat": {
+                    "type": "string"
+                },
+                "nama_penerima": {
+                    "type": "string"
+                },
+                "no_telp": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.UpdateUser": {
+            "type": "object",
+            "required": [
+                "email",
+                "id_kota",
+                "id_provinsi",
+                "jenis_kelamin",
+                "nama",
+                "no_telp",
+                "pekerjaan",
+                "tanggal_lahir",
+                "tentang"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id_kota": {
+                    "type": "string"
+                },
+                "id_provinsi": {
+                    "type": "string"
+                },
+                "jenis_kelamin": {
+                    "type": "string"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "no_telp": {
+                    "type": "string"
+                },
+                "pekerjaan": {
+                    "type": "string"
+                },
+                "tanggal_lahir": {
+                    "type": "string"
+                },
+                "tentang": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserResp": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id_kota": {
+                    "$ref": "#/definitions/dto.CityResp"
+                },
+                "id_provinsi": {
+                    "$ref": "#/definitions/dto.ProvinceResp"
+                },
+                "is_admin": {
+                    "type": "boolean"
+                },
+                "nama": {
+                    "type": "string"
+                },
+                "no_telp": {
+                    "type": "string"
+                },
+                "pekerjaan": {
+                    "type": "string"
+                },
+                "tanggal_lahir": {
+                    "type": "string"
+                },
+                "tentang": {
+                    "type": "string"
+                }
+            }
+        },
         "helper.Response": {
             "type": "object",
             "properties": {
@@ -266,6 +748,13 @@ const docTemplate = `{
                     "type": "boolean"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
         }
     }
 }`

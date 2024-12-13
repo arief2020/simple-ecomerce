@@ -1,5 +1,23 @@
 basePath: /api/v1
 definitions:
+  dto.AlamatResp:
+    properties:
+      detail_alamat:
+        type: string
+      id:
+        type: integer
+      judul_alamat:
+        type: string
+      nama_penerima:
+        type: string
+      no_telp:
+        type: string
+    required:
+    - detail_alamat
+    - judul_alamat
+    - nama_penerima
+    - no_telp
+    type: object
   dto.CityResp:
     description: Data kota yang terkait dengan user
     properties:
@@ -46,6 +64,24 @@ definitions:
     - pekerjaan
     - tanggal_lahir
     - tentang
+    type: object
+  dto.InserAlamatReq:
+    properties:
+      detail_alamat:
+        type: string
+      judul_alamat:
+        type: string
+      nama_penerima:
+        type: string
+      no_telp:
+        type: string
+      userId:
+        type: integer
+    required:
+    - detail_alamat
+    - judul_alamat
+    - nama_penerima
+    - no_telp
     type: object
   dto.Login:
     properties:
@@ -94,6 +130,73 @@ definitions:
         type: string
       name:
         example: Jawa Barat
+        type: string
+    type: object
+  dto.UpdateAlamatReq:
+    properties:
+      detail_alamat:
+        type: string
+      nama_penerima:
+        type: string
+      no_telp:
+        type: string
+      userId:
+        type: integer
+    required:
+    - detail_alamat
+    - nama_penerima
+    - no_telp
+    type: object
+  dto.UpdateUser:
+    properties:
+      email:
+        type: string
+      id_kota:
+        type: string
+      id_provinsi:
+        type: string
+      jenis_kelamin:
+        type: string
+      nama:
+        type: string
+      no_telp:
+        type: string
+      pekerjaan:
+        type: string
+      tanggal_lahir:
+        type: string
+      tentang:
+        type: string
+    required:
+    - email
+    - id_kota
+    - id_provinsi
+    - jenis_kelamin
+    - nama
+    - no_telp
+    - pekerjaan
+    - tanggal_lahir
+    - tentang
+    type: object
+  dto.UserResp:
+    properties:
+      email:
+        type: string
+      id_kota:
+        $ref: '#/definitions/dto.CityResp'
+      id_provinsi:
+        $ref: '#/definitions/dto.ProvinceResp'
+      is_admin:
+        type: boolean
+      nama:
+        type: string
+      no_telp:
+        type: string
+      pekerjaan:
+        type: string
+      tanggal_lahir:
+        type: string
+      tentang:
         type: string
     type: object
   helper.Response:
@@ -174,4 +277,199 @@ paths:
       summary: Register User
       tags:
       - Auth
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get my profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get my profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get My Profile
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Endpoint for get my profile
+      parameters:
+      - description: Update My Profile
+        in: body
+        name: update-profile
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to update my profile
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update My Profile
+      tags:
+      - User
+  /user/alamat:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get all my address
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all my address
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.AlamatResp'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get My Alamat
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Endpoint for create new address
+      parameters:
+      - description: Success to create new address
+        in: body
+        name: update-profile
+        required: true
+        schema:
+          $ref: '#/definitions/dto.InserAlamatReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to create new address
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create My New Alamat
+      tags:
+      - User
+  /user/alamat/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Endpoint for delete address by id
+      parameters:
+      - description: ID of the address
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to update address by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete My Alamat By ID
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get address by id
+      parameters:
+      - description: ID of the address
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get address by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AlamatResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get My Alamat By ID
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Endpoint for get address by id
+      parameters:
+      - description: ID of the address
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Success to update address
+        in: body
+        name: update-alamat
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAlamatReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to update address by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AlamatResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get My Alamat By ID
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: token
+    type: apiKey
 swagger: "2.0"
