@@ -24,6 +24,20 @@ definitions:
     - nama_penerima
     - no_telp
     type: object
+  dto.AllProductResp:
+    description: Data that will be returned when getting all products
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.ProductResp'
+        type: array
+      limit:
+        example: 10
+        type: integer
+      page:
+        example: 1
+        type: integer
+    type: object
   dto.CategoryReq:
     description: Data that will be used to create or update a category
     properties:
@@ -160,6 +174,59 @@ definitions:
         type: string
       url_foto:
         type: string
+    type: object
+  dto.PhotoProductResp:
+    description: Data that will be returned when getting product photos
+    properties:
+      id:
+        example: 999
+        type: integer
+      product_id:
+        example: 999
+        type: integer
+      url:
+        example: https://example.com/image.jpg
+        type: string
+    type: object
+  dto.ProductResp:
+    description: Data that will be returned when getting a product
+    properties:
+      category:
+        $ref: '#/definitions/dto.CategoryResp'
+      deskripsi:
+        example: Produk A
+        type: string
+      harga_konsumen:
+        example: "99999"
+        type: string
+      harga_reseller:
+        example: "9999"
+        type: string
+      id:
+        example: 999
+        type: integer
+      nama_produk:
+        example: Produk A
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/dto.PhotoProductResp'
+        type: array
+      slug:
+        example: produk-a
+        type: string
+      stok:
+        example: "9999"
+        type: string
+      toko:
+        $ref: '#/definitions/dto.TokoResp'
+    required:
+    - deskripsi
+    - harga_konsumen
+    - harga_reseller
+    - nama_produk
+    - slug
+    - stok
     type: object
   dto.ProvinceResp:
     description: Data provinsi yang terkait dengan user
@@ -467,6 +534,216 @@ paths:
       summary: Update Category By ID
       tags:
       - Category
+  /product:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for getting all products
+      parameters:
+      - description: Nama Produk
+        in: query
+        name: nama_produk
+        type: string
+      - description: Category ID
+        in: query
+        name: category_id
+        type: integer
+      - description: Toko ID
+        in: query
+        name: toko_id
+        type: integer
+      - description: Minimum Harga
+        in: query
+        name: min_harga
+        type: integer
+      - description: Maximum Harga
+        in: query
+        name: max_harga
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all product
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.AllProductResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Product
+      tags:
+      - Product
+    post:
+      consumes:
+      - multipart/form-data
+      description: Endpoint for creating a product with multiple photos
+      parameters:
+      - description: Nama Produk
+        in: formData
+        name: nama_produk
+        required: true
+        type: string
+      - description: Category ID
+        in: formData
+        name: category_id
+        required: true
+        type: integer
+      - description: Harga Reseller
+        in: formData
+        name: harga_reseller
+        required: true
+        type: string
+      - description: Harga Konsumen
+        in: formData
+        name: harga_konsumen
+        required: true
+        type: string
+      - description: Stok Produk
+        in: formData
+        name: stok
+        required: true
+        type: integer
+      - description: Deskripsi Produk
+        in: formData
+        name: deskripsi
+        required: true
+        type: string
+      - description: Photos of the Product (Multiple files allowed)
+        in: formData
+        name: photos
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Succeed to create product
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Product
+      tags:
+      - Product
+  /product/{id_product}:
+    delete:
+      consumes:
+      - application/json
+      description: Endpoint for deleting a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id_product
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to delete product by ID
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Product By ID
+      tags:
+      - Product
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for getting a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id_product
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get product by ID
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProductResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Product By ID
+      tags:
+      - Product
+    put:
+      consumes:
+      - multipart/form-data
+      description: Endpoint for updating a product by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id_product
+        required: true
+        type: integer
+      - description: Nama Produk
+        in: formData
+        name: nama_produk
+        required: true
+        type: string
+      - description: Category ID
+        in: formData
+        name: category_id
+        required: true
+        type: integer
+      - description: Harga Reseller
+        in: formData
+        name: harga_reseller
+        required: true
+        type: string
+      - description: Harga Konsumen
+        in: formData
+        name: harga_konsumen
+        required: true
+        type: string
+      - description: Stok Produk
+        in: formData
+        name: stok
+        required: true
+        type: integer
+      - description: Deskripsi Produk
+        in: formData
+        name: deskripsi
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to update product by ID
+          schema:
+            $ref: '#/definitions/helper.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Product By ID
+      tags:
+      - Product
   /provcity/detailcity/{city_id}:
     get:
       consumes:

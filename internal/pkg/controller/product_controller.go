@@ -25,6 +25,21 @@ func NewProductController(productUsc usecase.ProductUseCase) ProductController {
 	return &ProductControllerImpl{productUsc: productUsc}
 }
 
+// @Summary Create Product
+// @Description Endpoint for creating a product with multiple photos
+// @Tags Product
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param nama_produk formData string true "Nama Produk"
+// @Param category_id formData int true "Category ID"
+// @Param harga_reseller formData string true "Harga Reseller"
+// @Param harga_konsumen formData string true "Harga Konsumen"
+// @Param stok formData int true "Stok Produk"
+// @Param deskripsi formData string true "Deskripsi Produk"
+// @Param photos formData file true "Photos of the Product (Multiple files allowed)"
+// @Success 201 {object} helper.Response{data=int} "Succeed to create product"
+// @Router /product [post]
 func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 	data := new(dto.ProductCreateReq)
 	if err := ctx.BodyParser(data); err != nil {
@@ -64,6 +79,21 @@ func (c *ProductControllerImpl) CreateProduct(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, resUsc, fiber.StatusOK)
 }
 
+// @Summary Get All Product
+// @Description Endpoint for getting all products
+// @Tags Product
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param nama_produk query string false "Nama Produk"
+// @Param category_id query int false "Category ID"
+// @Param toko_id query int false "Toko ID"
+// @Param min_harga query int false "Minimum Harga"
+// @Param max_harga query int false "Maximum Harga"
+// @Param limit query int false "Limit"
+// @Param page query int false "Page"
+// @Success 200 {object} helper.Response{data=dto.AllProductResp} "Succeed to get all product"
+// @Router /product [get]
 func (c *ProductControllerImpl) GetAllProduct(ctx *fiber.Ctx) error {
 	filter := new(dto.AllProductFilter)
 	if err := ctx.QueryParser(filter); err != nil {
@@ -87,6 +117,15 @@ func (c *ProductControllerImpl) GetAllProduct(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, resUsc, fiber.StatusOK)
 }
 
+// @Summary Get Product By ID
+// @Description Endpoint for getting a product by ID
+// @Tags Product
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id_product path int true "Product ID"
+// @Success 200 {object} helper.Response{data=dto.ProductResp} "Succeed to get product by ID"
+// @Router /product/{id_product} [get]
 func (c *ProductControllerImpl) GetProductByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id_product")
 	productId := utils.StringToUint(id)
@@ -99,6 +138,15 @@ func (c *ProductControllerImpl) GetProductByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, resUsc, fiber.StatusOK)
 }
 
+// @Summary Delete Product By ID
+// @Description Endpoint for deleting a product by ID
+// @Tags Product
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id_product path int true "Product ID"
+// @Success 200 {object} helper.Response "Succeed to delete product by ID"
+// @Router /product/{id_product} [delete]
 func (c *ProductControllerImpl) DeleteProductByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id_product")
 	productId := utils.StringToUint(id)
@@ -111,6 +159,21 @@ func (c *ProductControllerImpl) DeleteProductByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to DELETE data", nil, "", fiber.StatusOK)
 }
 
+// @Summary Update Product By ID
+// @Description Endpoint for updating a product by ID
+// @Tags Product
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id_product path int true "Product ID"
+// @Param nama_produk formData string true "Nama Produk"
+// @Param category_id formData int true "Category ID"
+// @Param harga_reseller formData string true "Harga Reseller"
+// @Param harga_konsumen formData string true "Harga Konsumen"
+// @Param stok formData int true "Stok Produk"
+// @Param deskripsi formData string true "Deskripsi Produk"
+// @Success 200 {object} helper.Response "Succeed to update product by ID"
+// @Router /product/{id_product} [put]
 func (c *ProductControllerImpl) UpdateProductByID(ctx *fiber.Ctx) error {
 	id := ctx.Params("id_product")
 	productId := utils.StringToUint(id)
