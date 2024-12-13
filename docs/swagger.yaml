@@ -150,6 +150,17 @@ definitions:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
     type: object
+  dto.MyTokoResp:
+    properties:
+      id:
+        type: integer
+      id_user:
+        type: integer
+      nama_toko:
+        type: string
+      url_foto:
+        type: string
+    type: object
   dto.ProvinceResp:
     description: Data provinsi yang terkait dengan user
     properties:
@@ -158,6 +169,15 @@ definitions:
         type: string
       name:
         example: Jawa Barat
+        type: string
+    type: object
+  dto.TokoResp:
+    properties:
+      id:
+        type: integer
+      nama_toko:
+        type: string
+      url_foto:
         type: string
     type: object
   dto.UpdateAlamatReq:
@@ -447,6 +467,127 @@ paths:
       summary: Update Category By ID
       tags:
       - Category
+  /toko:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get all toko
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: nama
+        type: string
+      - in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all toko
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.TokoResp'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Toko
+      tags:
+      - Toko
+  /toko/{id_toko}:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get toko by id
+      parameters:
+      - description: Toko ID
+        in: path
+        name: id_toko
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get toko by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TokoResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Toko By ID
+      tags:
+      - Toko
+    put:
+      consumes:
+      - application/json
+      description: Endpoint for update my toko
+      parameters:
+      - description: Toko ID
+        in: path
+        name: id_toko
+        required: true
+        type: integer
+      - description: Toko Name
+        in: formData
+        name: nama_toko
+        required: true
+        type: string
+      - description: Toko Photo
+        in: formData
+        name: photo
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to update my toko
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update My Toko
+      tags:
+      - Toko
+  /toko/my:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get my toko
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get my toko
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.MyTokoResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get My Toko
+      tags:
+      - Toko
   /user:
     get:
       consumes:

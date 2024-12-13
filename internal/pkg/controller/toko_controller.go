@@ -26,6 +26,23 @@ func NewTokoController(tokoUsc usecase.TokoUseCase) TokoController {
 	return &TokoControllerImpl{tokoUsc: tokoUsc}
 }
 
+// @Summary Get All Category
+// @Description Endpoint for get all category
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} helper.Response{data=[]dto.CategoryResp} "Succeed to get all category"
+// @Router /category [get]
+
+// @Summary Get My Toko
+// @Description Endpoint for get my toko
+// @Tags Toko
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} helper.Response{data=dto.MyTokoResp} "Succeed to get my toko"
+// @Router /toko/my [get]
 func (c *TokoControllerImpl) GetMyToko(ctx *fiber.Ctx) error {
 
 	userId := ctx.Locals("userid").(string)
@@ -46,6 +63,16 @@ func (c *TokoControllerImpl) GetMyToko(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
+
+// @Summary Get Toko By ID
+// @Description Endpoint for get toko by id
+// @Tags Toko
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id_toko path int true "Toko ID"
+// @Success 200 {object} helper.Response{data=dto.TokoResp} "Succeed to get toko by id"
+// @Router /toko/{id_toko} [get]
 func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 
 	id, err := ctx.ParamsInt("id_toko")
@@ -63,6 +90,16 @@ func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
+
+// @Summary Get All Toko
+// @Description Endpoint for get all toko
+// @Tags Toko
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param query-filter query dto.TokoFilter true "Toko Filter"
+// @Success 200 {object} helper.Response{data=[]dto.TokoResp} "Succeed to get all toko"
+// @Router /toko [get]
 func (c *TokoControllerImpl) GetAllToko(ctx *fiber.Ctx) error {
 
 	filter := new(dto.TokoFilter)
@@ -84,6 +121,17 @@ func (c *TokoControllerImpl) GetAllToko(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
+// @Summary Update My Toko
+// @Description Endpoint for update my toko
+// @Tags Toko
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id_toko path int true "Toko ID"
+// @Param nama_toko formData string true "Toko Name"
+// @Param photo formData file true "Toko Photo"
+// @Success 200 {object} helper.Response{data=string} "Succeed to update my toko"
+// @Router /toko/{id_toko} [put]
 func (c *TokoControllerImpl) UpdateMyToko(ctx *fiber.Ctx) error {
 	idToko, err := ctx.ParamsInt("id_toko")
 	if err != nil {

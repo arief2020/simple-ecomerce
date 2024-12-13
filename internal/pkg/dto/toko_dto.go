@@ -1,7 +1,9 @@
 package dto
 
-type CreateTokoReq struct {
-	UserID uint `json:"id_user" validate:"required"`
+type TokoFilter struct {
+	Limit int    `query:"limit"`
+	Page  int    `query:"page"`
+	Nama  string `query:"nama"`
 }
 
 type UpdateProfileTokoReq struct {
@@ -19,12 +21,6 @@ type TokoResp struct {
 	ID       uint    `json:"id"`
 	NamaToko *string `json:"nama_toko"`
 	UrlFoto  *string `json:"url_foto"`
-}
-
-type TokoFilter struct {
-	Limit int    `query:"limit"`
-	Page  int    `query:"page"`
-	Nama  string `query:"nama"`
 }
 
 type AllTokoResp struct {
