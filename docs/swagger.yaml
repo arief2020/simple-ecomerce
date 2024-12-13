@@ -38,6 +38,17 @@ definitions:
         example: 1
         type: integer
     type: object
+  dto.AllTransactionResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.TransactionResponse'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+    type: object
   dto.CategoryReq:
     description: Data that will be used to create or update a category
     properties:
@@ -103,6 +114,17 @@ definitions:
     - pekerjaan
     - tanggal_lahir
     - tentang
+    type: object
+  dto.DetailTrx:
+    properties:
+      harga_total:
+        type: integer
+      kuantitas:
+        type: integer
+      product:
+        $ref: '#/definitions/dto.TransactionProductResp'
+      toko:
+        $ref: '#/definitions/dto.TokoResp'
     type: object
   dto.InserAlamatReq:
     description: Data that will be used to insert a new address
@@ -245,6 +267,70 @@ definitions:
       nama_toko:
         type: string
       url_foto:
+        type: string
+    type: object
+  dto.TransactionDetailReq:
+    properties:
+      kuantitas:
+        type: integer
+      product_id:
+        type: integer
+    type: object
+  dto.TransactionProductResp:
+    properties:
+      category:
+        $ref: '#/definitions/dto.CategoryResp'
+      deskripsi:
+        type: string
+      harga_konsumen:
+        type: string
+      harga_reseller:
+        type: string
+      id:
+        type: integer
+      nama_produk:
+        type: string
+      photos:
+        items:
+          $ref: '#/definitions/dto.PhotoProductResp'
+        type: array
+      slug:
+        type: string
+      toko:
+        $ref: '#/definitions/dto.TokoResp'
+    required:
+    - deskripsi
+    - harga_konsumen
+    - harga_reseller
+    - nama_produk
+    - slug
+    type: object
+  dto.TransactionRequest:
+    properties:
+      alamat_kirim:
+        type: integer
+      detail_trx:
+        items:
+          $ref: '#/definitions/dto.TransactionDetailReq'
+        type: array
+      method_bayar:
+        type: string
+    type: object
+  dto.TransactionResponse:
+    properties:
+      alamat_kirim:
+        $ref: '#/definitions/dto.AlamatResp'
+      detail_trx:
+        items:
+          $ref: '#/definitions/dto.DetailTrx'
+        type: array
+      harga_total:
+        type: integer
+      id:
+        type: integer
+      kode_invoice:
+        type: string
+      method_bayar:
         type: string
     type: object
   dto.UpdateAlamatReq:
@@ -977,6 +1063,86 @@ paths:
       summary: Get My Toko
       tags:
       - Toko
+  /trx:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get all transaction
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all transaction
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.AllTransactionResponse'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Transaction
+      tags:
+      - Transaction
+    post:
+      consumes:
+      - application/json
+      description: Endpoint for create transaction
+      parameters:
+      - description: Create Transaction
+        in: body
+        name: create-transaction
+        required: true
+        schema:
+          $ref: '#/definitions/dto.TransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Succeed to create transaction
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  type: integer
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Transaction
+      tags:
+      - Transaction
+  /trx/{id_trx}:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get transaction by id
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id_trx
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get transaction by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.TransactionResponse'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Transaction By ID
+      tags:
+      - Transaction
   /user:
     get:
       consumes:

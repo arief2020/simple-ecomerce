@@ -23,6 +23,15 @@ func NewTrxController(trxUsc usecase.TrxUseCase) TrxController {
 	return &TrxControllerImpl{trxUsc: trxUsc}
 }
 
+// @Summary Create Transaction
+// @Description Endpoint for create transaction
+// @Tags Transaction
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param create-transaction body dto.TransactionRequest true "Create Transaction"
+// @Success 201 {object} helper.Response{data=int} "Succeed to create transaction"
+// @Router /trx [post]
 func (t *TrxControllerImpl) CreateTransction(ctx *fiber.Ctx) error {
 	var req dto.TransactionRequest
 	if err := ctx.BodyParser(&req); err != nil {
@@ -44,6 +53,14 @@ func (t *TrxControllerImpl) CreateTransction(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, resUsc, fiber.StatusCreated)
 }
 
+// @Summary Get All Transaction
+// @Description Endpoint for get all transaction
+// @Tags Transaction
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} helper.Response{data=[]dto.AllTransactionResponse} "Succeed to get all transaction"
+// @Router /trx [get]
 func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 	userId := ctx.Locals("userid").(string)
 
@@ -69,6 +86,15 @@ func (t *TrxControllerImpl) GetAllTransctionByUserID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, resUsc, fiber.StatusOK)
 }
 
+// @Summary Get Transaction By ID
+// @Description Endpoint for get transaction by id
+// @Tags Transaction
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id_trx path int true "Transaction ID"
+// @Success 200 {object} helper.Response{data=dto.TransactionResponse} "Succeed to get transaction by id"
+// @Router /trx/{id_trx} [get]
 func (t *TrxControllerImpl) GetTransactionByID(ctx *fiber.Ctx) error {
 	userId := ctx.Locals("userid").(string)
 	uintUserId := utils.StringToUint(userId)

@@ -1093,6 +1093,147 @@ const docTemplate = `{
                 }
             }
         },
+        "/trx": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get all transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Get All Transaction",
+                "responses": {
+                    "200": {
+                        "description": "Succeed to get all transaction",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/dto.AllTransactionResponse"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for create transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Create Transaction",
+                "parameters": [
+                    {
+                        "description": "Create Transaction",
+                        "name": "create-transaction",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.TransactionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Succeed to create transaction",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/trx/{id_trx}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Endpoint for get transaction by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Get Transaction By ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Transaction ID",
+                        "name": "id_trx",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Succeed to get transaction by id",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/helper.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/dto.TransactionResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "get": {
                 "security": [
@@ -1488,6 +1629,23 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.AllTransactionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TransactionResponse"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.CategoryReq": {
             "description": "Data that will be used to create or update a category",
             "type": "object",
@@ -1577,6 +1735,23 @@ const docTemplate = `{
                 },
                 "tentang": {
                     "type": "string"
+                }
+            }
+        },
+        "dto.DetailTrx": {
+            "type": "object",
+            "properties": {
+                "harga_total": {
+                    "type": "integer"
+                },
+                "kuantitas": {
+                    "type": "integer"
+                },
+                "product": {
+                    "$ref": "#/definitions/dto.TransactionProductResp"
+                },
+                "toko": {
+                    "$ref": "#/definitions/dto.TokoResp"
                 }
             }
         },
@@ -1776,6 +1951,102 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "url_foto": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TransactionDetailReq": {
+            "type": "object",
+            "properties": {
+                "kuantitas": {
+                    "type": "integer"
+                },
+                "product_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.TransactionProductResp": {
+            "type": "object",
+            "required": [
+                "deskripsi",
+                "harga_konsumen",
+                "harga_reseller",
+                "nama_produk",
+                "slug"
+            ],
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/dto.CategoryResp"
+                },
+                "deskripsi": {
+                    "type": "string"
+                },
+                "harga_konsumen": {
+                    "type": "string"
+                },
+                "harga_reseller": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "nama_produk": {
+                    "type": "string"
+                },
+                "photos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.PhotoProductResp"
+                    }
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "toko": {
+                    "$ref": "#/definitions/dto.TokoResp"
+                }
+            }
+        },
+        "dto.TransactionRequest": {
+            "type": "object",
+            "properties": {
+                "alamat_kirim": {
+                    "type": "integer"
+                },
+                "detail_trx": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.TransactionDetailReq"
+                    }
+                },
+                "method_bayar": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.TransactionResponse": {
+            "type": "object",
+            "properties": {
+                "alamat_kirim": {
+                    "$ref": "#/definitions/dto.AlamatResp"
+                },
+                "detail_trx": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.DetailTrx"
+                    }
+                },
+                "harga_total": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "kode_invoice": {
+                    "type": "string"
+                },
+                "method_bayar": {
                     "type": "string"
                 }
             }
