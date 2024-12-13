@@ -34,6 +34,15 @@ func NewProvinceCityController(provincecityusecase usecase.ProvinceCityUseCase) 
 	}
 }
 
+
+// @Summary Get All Provinces
+// @Description Endpoint for get all provinces
+// @Tags Province City
+// @Accept json	
+// @Produce json
+// @Param filter query dto.ProvinceFilter true "Province Filter"
+// @Success 200 {object} helper.Response{data=[]dto.ProvinceResp} "Succeed to get all provinces"
+// @Router /provcity/listprovincies [get]
 func (uc *ProvinceCityControllerImpl) GetAllProvinces(ctx *fiber.Ctx) error {
 	c := ctx.Context()
 
@@ -53,6 +62,14 @@ func (uc *ProvinceCityControllerImpl) GetAllProvinces(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
+// @Summary Get All Cities By Province ID
+// @Description Endpoint for get all cities by province id
+// @Tags Province City
+// @Accept json	
+// @Produce json
+// @Param prov_id path int true "Province ID"
+// @Success 200 {object} helper.Response{data=[]dto.CityResp} "Succeed to get all cities by province id"
+// @Router /provcity/listcities/{prov_id} [get]
 func (uc *ProvinceCityControllerImpl) GetAllCitiesByProvinceID(ctx *fiber.Ctx) error {
 	c := ctx.Context()
 
@@ -68,14 +85,17 @@ func (uc *ProvinceCityControllerImpl) GetAllCitiesByProvinceID(ctx *fiber.Ctx) e
 		return helper.BuildResponse(ctx, false, "Failed to GET data", customErr.Err, nil, fiber.StatusBadRequest)
 	}
 
-	// return helper.ResponseWithJSON(&helper.JSONRespArgs{
-	// 	Ctx:        ctx,
-	// 	StatusCode: fiber.StatusOK,
-	// 	Data:       res,
-	// })
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
+// @Summary Get Province By ID
+// @Description Endpoint for get province by id
+// @Tags Province City
+// @Accept json	
+// @Produce json
+// @Param prov_id path int true "Province ID"
+// @Success 200 {object} helper.Response{data=dto.ProvinceResp} "Succeed to get province by id"
+// @Router /provcity/detailprovince/{prov_id} [get]
 func (uc *ProvinceCityControllerImpl) GetProvinceByID(ctx *fiber.Ctx) error {
 	c := ctx.Context()
 
@@ -94,6 +114,14 @@ func (uc *ProvinceCityControllerImpl) GetProvinceByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, res, fiber.StatusOK)
 }
 
+// @Summary Get City By ID
+// @Description Endpoint for get city by id
+// @Tags Province City
+// @Accept json	
+// @Produce json
+// @Param city_id path int true "City ID"
+// @Success 200 {object} helper.Response{data=dto.CityResp} "Succeed to get city by id"
+// @Router /provcity/detailcity/{city_id} [get]
 func (uc *ProvinceCityControllerImpl) GetCityByID(ctx *fiber.Ctx) error {
 	c := ctx.Context()
 

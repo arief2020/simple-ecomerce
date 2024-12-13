@@ -467,6 +467,118 @@ paths:
       summary: Update Category By ID
       tags:
       - Category
+  /provcity/detailcity/{city_id}:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get city by id
+      parameters:
+      - description: City ID
+        in: path
+        name: city_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get city by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CityResp'
+              type: object
+      summary: Get City By ID
+      tags:
+      - Province City
+  /provcity/detailprovince/{prov_id}:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get province by id
+      parameters:
+      - description: Province ID
+        in: path
+        name: prov_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get province by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProvinceResp'
+              type: object
+      summary: Get Province By ID
+      tags:
+      - Province City
+  /provcity/listcities/{prov_id}:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get all cities by province id
+      parameters:
+      - description: Province ID
+        in: path
+        name: prov_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all cities by province id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CityResp'
+                  type: array
+              type: object
+      summary: Get All Cities By Province ID
+      tags:
+      - Province City
+  /provcity/listprovincies:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get all provinces
+      parameters:
+      - in: query
+        name: limit
+        type: integer
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all provinces
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ProvinceResp'
+                  type: array
+              type: object
+      summary: Get All Provinces
+      tags:
+      - Province City
   /toko:
     get:
       consumes:

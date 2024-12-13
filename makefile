@@ -52,4 +52,4 @@ dockeenter:
 	docker exec -it example_fiber bash
 
 swag:
-	swag init --dir ./app,./internal
+	swag init --dir ./app,./internal/pkg/controller,./internal/pkg/dto,./internal/helper
