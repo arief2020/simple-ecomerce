@@ -7,6 +7,7 @@ definitions:
         example: Jl. Contoh No. 123
         type: string
       id:
+        example: 999
         type: integer
       judul_alamat:
         example: Alamat Rumah
@@ -22,6 +23,25 @@ definitions:
     - judul_alamat
     - nama_penerima
     - no_telp
+    type: object
+  dto.CategoryReq:
+    description: Data that will be used to create or update a category
+    properties:
+      nama_category:
+        example: Makanan
+        type: string
+    required:
+    - nama_category
+    type: object
+  dto.CategoryResp:
+    description: Data that will be returned in the response
+    properties:
+      id:
+        example: 999
+        type: integer
+      nama_category:
+        example: Makanan
+        type: string
     type: object
   dto.CityResp:
     description: Data kota yang terkait dengan user
@@ -287,6 +307,146 @@ paths:
       summary: Register User
       tags:
       - Auth
+  /category:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get all category
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get all category
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.CategoryResp'
+                  type: array
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Category
+      tags:
+      - Category
+    post:
+      consumes:
+      - application/json
+      description: Endpoint for create category (admin only)
+      parameters:
+      - description: Create Category
+        in: body
+        name: create-category
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Succeed to create category
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CategoryResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Create Category
+      tags:
+      - Category
+  /category/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Endpoint for delete category by id (admin only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to delete category by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CategoryResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Category By ID
+      tags:
+      - Category
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for get category by id (admin only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to get category by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CategoryResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Get Category By ID
+      tags:
+      - Category
+    put:
+      consumes:
+      - application/json
+      description: Endpoint for update category by id (admin only)
+      parameters:
+      - description: Category ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Category
+        in: body
+        name: update-category
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Succeed to update category by id
+          schema:
+            allOf:
+            - $ref: '#/definitions/helper.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.CategoryResp'
+              type: object
+      security:
+      - ApiKeyAuth: []
+      summary: Update Category By ID
+      tags:
+      - Category
   /user:
     get:
       consumes:

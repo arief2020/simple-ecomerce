@@ -27,6 +27,14 @@ func NewCategoryController(categoryUsc usecase.CategoryUseCase) CategoryControll
 	}
 }
 
+// @Summary Get All Category
+// @Description Endpoint for get all category
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} helper.Response{data=[]dto.CategoryResp} "Succeed to get all category"
+// @Router /category [get]
 func (c *CategoryControllerImpl) GetAllCategory(ctx *fiber.Ctx) error {
 	categories, err := c.categoryUsc.GetAllCategory(ctx.Context())
 	if err != nil {
@@ -37,6 +45,16 @@ func (c *CategoryControllerImpl) GetAllCategory(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, categories, fiber.StatusOK)
 }
 
+
+// @Summary Get Category By ID
+// @Description Endpoint for get category by id (admin only)
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "Category ID"
+// @Success 200 {object} helper.Response{data=dto.CategoryResp} "Succeed to get category by id"
+// @Router /category/{id} [get]
 func (c *CategoryControllerImpl) GetCategoryByID(ctx *fiber.Ctx) error {
 	id, err := ctx.ParamsInt("id")
 	if err != nil {
@@ -53,6 +71,15 @@ func (c *CategoryControllerImpl) GetCategoryByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, category, fiber.StatusOK)
 }
 
+// @Summary Create Category
+// @Description Endpoint for create category (admin only)
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param create-category body dto.CategoryReq true "Create Category"
+// @Success 201 {object} helper.Response{data=dto.CategoryResp} "Succeed to create category"
+// @Router /category [post]
 func (c *CategoryControllerImpl) CreateCategory(ctx *fiber.Ctx) error {
 	data := new(dto.CategoryReq)
 	if err := ctx.BodyParser(data); err != nil {
@@ -69,6 +96,16 @@ func (c *CategoryControllerImpl) CreateCategory(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to CREATE data", nil, category, fiber.StatusCreated)
 }
 
+// @Summary Update Category By ID
+// @Description Endpoint for update category by id (admin only)
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "Category ID"
+// @Param update-category body dto.CategoryReq true "Update Category"
+// @Success 200 {object} helper.Response{data=dto.CategoryResp} "Succeed to update category by id"
+// @Router /category/{id} [put]
 func (c *CategoryControllerImpl) UpdateCategoryByID(ctx *fiber.Ctx) error {
 	id, err := ctx.ParamsInt("id")
 	if err != nil {
@@ -91,6 +128,16 @@ func (c *CategoryControllerImpl) UpdateCategoryByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to UPDATE data", nil, "", fiber.StatusOK)
 }
 
+
+// @Summary Delete Category By ID
+// @Description Endpoint for delete category by id (admin only)
+// @Tags Category
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "Category ID"
+// @Success 200 {object} helper.Response{data=dto.CategoryResp} "Succeed to delete category by id"
+// @Router /category/{id} [delete]	
 func (c *CategoryControllerImpl) DeleteCategoryByID(ctx *fiber.Ctx) error {
 	id, err := ctx.ParamsInt("id")
 	if err != nil {
