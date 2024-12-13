@@ -26,7 +26,7 @@ type FiltersAlamat struct {
 // AlamatResp represents the response data for an address.
 // @Description Data that will be returned in the response
 type AlamatResp struct {
-	Id           uint   `json:"id" example:999`
+	Id           uint   `json:"id" example:"999"`
 	JudulAlamat  string `json:"judul_alamat" validate:"required" example:"Alamat Rumah"`
 	NamaPenerima string `json:"nama_penerima" validate:"required" example:"Budi"`
 	NoTelp       string `json:"no_telp" validate:"required" example:"08123456789"`
