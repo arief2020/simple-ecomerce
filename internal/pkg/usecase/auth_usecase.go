@@ -119,6 +119,34 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 		}
 	}
 
+	TanggalLahirParse, errParse := utils.ParseDate(params.TanggalLahir)
+	if errParse != nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Parse Date : %s", errParse.Error()))
+
+		return res, &helper.ErrorStruct{
+			Code: fiber.StatusBadRequest,
+			Err:  errParse,
+		}
+	}
+
+	_, errEmailRepo := alc.userrepository.GetUsersByEmail(ctx, params.Email)
+	if errEmailRepo == nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error email exists: Get User By Email")
+		return res, &helper.ErrorStruct{
+			Err:  errors.New("email already exists"),
+			Code: fiber.StatusConflict,
+		}
+	}
+
+	_, errNoTelpRepo := alc.userrepository.GetUserByNoTelp(ctx, params.NoTelp)
+	if errNoTelpRepo == nil {
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error no telp exists: Get User By NoTelp")
+		return res, &helper.ErrorStruct{
+			Err:  errors.New("no telp already exists"),
+			Code: fiber.StatusConflict,
+		}
+	}
+
 	resCityByProvRepo, _ := alc.provinceCityRepository.GetAllCitiesByProvinceID(ctx, params.IdProvinsi)
 	if resCityByProvRepo == nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Not Found: Get City By Province ID")
@@ -147,16 +175,6 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 		}
 	}
 
-	TanggalLahirParse, errParse := utils.ParseDate(params.TanggalLahir)
-	if errParse != nil {
-		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at Parse Date : %s", errParse.Error()))
-
-		return res, &helper.ErrorStruct{
-			Code: fiber.StatusBadRequest,
-			Err:  errParse,
-		}
-	}
-
 	resRepo, errRepo := alc.userrepository.CreateUsers(ctx, entity.User{
 		Email:        params.Email,
 		Nama:         params.Name,
@@ -182,6 +200,7 @@ func (alc *AuthUseCaseImpl) CreateUsers(ctx context.Context, params userdto.Crea
 		UrlFoto:  nil,
 		UserID:   resRepo.ID,
 	})
+
 	if errRepoToko != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, fmt.Sprintf("Error at CreateToko : %s", errRepo))
 		return res, &helper.ErrorStruct{

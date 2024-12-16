@@ -63,7 +63,6 @@ func (c *TokoControllerImpl) GetMyToko(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
 
-
 // @Summary Get Toko By ID
 // @Description Endpoint for get toko by id
 // @Tags Toko
@@ -89,7 +88,6 @@ func (c *TokoControllerImpl) GetTokoByID(ctx *fiber.Ctx) error {
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, toko, fiber.StatusOK)
 }
-
 
 // @Summary Get All Toko
 // @Description Endpoint for get all toko

@@ -4,18 +4,19 @@ import (
 	"fmt"
 	"tugas_akhir_example/internal/helper"
 	"tugas_akhir_example/internal/infrastructure/container"
+	"tugas_akhir_example/internal/utils"
 
 	rest "tugas_akhir_example/internal/server/http"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/sirupsen/logrus"
-	// swagger "github.com/gofiber/contrib/swagger"
-	"github.com/gofiber/swagger"
-	_ "tugas_akhir_example/docs"
-)
 
-const currentfilepath = "app/main.go"
+	// swagger "github.com/gofiber/contrib/swagger"
+	_ "tugas_akhir_example/docs"
+
+	"github.com/gofiber/swagger"
+)
 
 // @title GoFiber Example API
 // @version 1.0
@@ -51,6 +52,6 @@ func main() {
 	port := fmt.Sprintf("%s:%d", containerConf.Apps.Host, containerConf.Apps.HttpPort)
 	if err := app.Listen(port); err != nil {
 		// helper.Logger(helper.LoggerLevelFatal, "error", err)
-		helper.Logger(currentfilepath, helper.LoggerLevelFatal, "error")
+		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelFatal, "error")
 	}
 }

@@ -107,7 +107,7 @@ func (c *CategoryUseCaseImpl) UpdateCategoryByID(ctx context.Context, id uint, d
 		}
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Category By Id")
 		return nil, &helper.ErrorStruct{
-			Err: errGetCategory,
+			Err:  errGetCategory,
 			Code: fiber.StatusBadRequest,
 		}
 	}

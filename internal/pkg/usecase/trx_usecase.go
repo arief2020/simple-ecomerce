@@ -135,7 +135,7 @@ func (t *TrxUseCaseImpl) CreateTrx(ctx context.Context, trxDto dto.TransactionRe
 	}
 
 	dataTrx := &entity.Trx{
-		UserID:      userId,
+		UserID: userId,
 		// AlamatID:    uint(trxDto.AlamatKirim),
 		AlamatID:    uint(trxDto.AlamatKirim),
 		HargaTotal:  trxTotal,

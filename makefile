@@ -53,3 +53,12 @@ dockeenter:
 
 swag:
 	swag init --dir ./app,./internal/pkg/controller,./internal/pkg/dto,./internal/helper
+
+runtest:
+	$env:ENV_MODE="test"; go run app/main.go
+
+rundev:
+	$env:ENV_MODE="development"; go run app/main.go
+
+formatcode:
+	gofmt -w .

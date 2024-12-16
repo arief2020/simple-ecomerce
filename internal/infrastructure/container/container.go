@@ -48,7 +48,23 @@ func loadEnv() {
 	currentWorkDirectory, _ := os.Getwd()
 	rootPath := projectName.Find([]byte(currentWorkDirectory))
 
-	v.SetConfigFile(string(rootPath) + `/.env`)
+	// Cek mode environment
+	envMode := os.Getenv("ENV_MODE")
+	if envMode == "" {
+		envMode = "development" // Default ke development
+	}
+
+	// Load file .env sesuai dengan mode environment
+	envFile := fmt.Sprintf("%s/.env.%s", string(rootPath), envMode)
+	v.SetConfigFile(envFile)
+	v.SetConfigType("env") // Explicitly set file type to ENV
+
+	fmt.Printf("Loading config from: %s\n", envFile)
+
+	// Error handling jika file tidak ditemukan
+	if err := v.ReadInConfig(); err != nil {
+		panic(fmt.Errorf("fatal error loading env file: %w", err))
+	}
 }
 
 func init() {

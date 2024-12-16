@@ -24,17 +24,17 @@ type ProductUseCase interface {
 }
 
 type ProductUseCaseImpl struct {
-	productRepo repository.ProductRepository
-	tokoRepo    repository.TokoRepository
-	userRepo    repository.UsersRepository
+	productRepo  repository.ProductRepository
+	tokoRepo     repository.TokoRepository
+	userRepo     repository.UsersRepository
 	categoryRepo repository.CategoryRepository
 }
 
 func NewProductUseCase(productRepo repository.ProductRepository, tokoRepo repository.TokoRepository, userRepo repository.UsersRepository, categoryRepo repository.CategoryRepository) ProductUseCase {
 	return &ProductUseCaseImpl{
-		productRepo: productRepo,
-		tokoRepo:    tokoRepo,
-		userRepo:    userRepo,
+		productRepo:  productRepo,
+		tokoRepo:     tokoRepo,
+		userRepo:     userRepo,
 		categoryRepo: categoryRepo,
 	}
 }
@@ -51,14 +51,12 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 		if errors.Is(errCategoryRepo, gorm.ErrRecordNotFound) {
 			helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Category Not Found")
 			return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New("category not found")}
-			
+
 		}
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get Category By ID")
 		return 0, &helper.ErrorStruct{Code: fiber.StatusBadRequest, Err: errors.New(errCategoryRepo.Error())}
-		
-	}
 
-	
+	}
 
 	dataToko, err := u.tokoRepo.GetTokoByUserId(ctx, userId)
 	if err != nil {
@@ -87,7 +85,6 @@ func (u *ProductUseCaseImpl) CreateProduct(ctx context.Context, productReq dto.P
 		}
 		pathUploadedPhotos = append(pathUploadedPhotos, uploadedPhoto)
 	}
-
 
 	resCreateRepo, errRepo := u.productRepo.CreateProduct(ctx, dataReq)
 	if errRepo != nil {

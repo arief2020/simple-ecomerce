@@ -39,12 +39,11 @@ func (c *CategoryControllerImpl) GetAllCategory(ctx *fiber.Ctx) error {
 	categories, err := c.categoryUsc.GetAllCategory(ctx.Context())
 	if err != nil {
 		helper.Logger(utils.GetFunctionPath(), helper.LoggerLevelError, "Error Get All Category")
-		return helper.BuildResponse(ctx, false, "Failed to GET data", err.Err.Error(), nil, fiber.StatusBadRequest)
+		return helper.BuildResponse(ctx, false, "Failed to GET data", err.Err.Error(), nil, fiber.StatusInternalServerError)
 	}
 
 	return helper.BuildResponse(ctx, true, "Succeed to GET data", nil, categories, fiber.StatusOK)
 }
-
 
 // @Summary Get Category By ID
 // @Description Endpoint for get category by id (admin only)
@@ -128,7 +127,6 @@ func (c *CategoryControllerImpl) UpdateCategoryByID(ctx *fiber.Ctx) error {
 	return helper.BuildResponse(ctx, true, "Succeed to UPDATE data", nil, "", fiber.StatusOK)
 }
 
-
 // @Summary Delete Category By ID
 // @Description Endpoint for delete category by id (admin only)
 // @Tags Category
@@ -137,7 +135,7 @@ func (c *CategoryControllerImpl) UpdateCategoryByID(ctx *fiber.Ctx) error {
 // @Security ApiKeyAuth
 // @Param id path int true "Category ID"
 // @Success 200 {object} helper.Response{data=dto.CategoryResp} "Succeed to delete category by id"
-// @Router /category/{id} [delete]	
+// @Router /category/{id} [delete]
 func (c *CategoryControllerImpl) DeleteCategoryByID(ctx *fiber.Ctx) error {
 	id, err := ctx.ParamsInt("id")
 	if err != nil {

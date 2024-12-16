@@ -34,11 +34,10 @@ func NewProvinceCityController(provincecityusecase usecase.ProvinceCityUseCase) 
 	}
 }
 
-
 // @Summary Get All Provinces
 // @Description Endpoint for get all provinces
 // @Tags Province City
-// @Accept json	
+// @Accept json
 // @Produce json
 // @Param filter query dto.ProvinceFilter true "Province Filter"
 // @Success 200 {object} helper.Response{data=[]dto.ProvinceResp} "Succeed to get all provinces"
@@ -65,7 +64,7 @@ func (uc *ProvinceCityControllerImpl) GetAllProvinces(ctx *fiber.Ctx) error {
 // @Summary Get All Cities By Province ID
 // @Description Endpoint for get all cities by province id
 // @Tags Province City
-// @Accept json	
+// @Accept json
 // @Produce json
 // @Param prov_id path int true "Province ID"
 // @Success 200 {object} helper.Response{data=[]dto.CityResp} "Succeed to get all cities by province id"
@@ -91,7 +90,7 @@ func (uc *ProvinceCityControllerImpl) GetAllCitiesByProvinceID(ctx *fiber.Ctx) e
 // @Summary Get Province By ID
 // @Description Endpoint for get province by id
 // @Tags Province City
-// @Accept json	
+// @Accept json
 // @Produce json
 // @Param prov_id path int true "Province ID"
 // @Success 200 {object} helper.Response{data=dto.ProvinceResp} "Succeed to get province by id"
@@ -117,7 +116,7 @@ func (uc *ProvinceCityControllerImpl) GetProvinceByID(ctx *fiber.Ctx) error {
 // @Summary Get City By ID
 // @Description Endpoint for get city by id
 // @Tags Province City
-// @Accept json	
+// @Accept json
 // @Produce json
 // @Param city_id path int true "City ID"
 // @Success 200 {object} helper.Response{data=dto.CityResp} "Succeed to get city by id"

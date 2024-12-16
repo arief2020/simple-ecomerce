@@ -25,7 +25,6 @@ func NewAuthController(authUsc usecase.AuthsUseCase) AuthController {
 	}
 }
 
-
 // @Summary Login User
 // @Description Endpoint untuk login user dan mengembalikan data user beserta token
 // @Tags Auth

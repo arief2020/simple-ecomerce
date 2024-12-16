@@ -29,6 +29,7 @@ type UpdateUser struct {
 	IdProvinsi   string `json:"id_provinsi" validate:"required"`
 	IdKota       string `json:"id_kota" validate:"required"`
 }
+
 // LoginRes represents the response data for a successful login.
 // @Description Data yang dikembalikan setelah user berhasil login
 type LoginRes struct {
