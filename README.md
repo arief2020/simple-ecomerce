@@ -48,4 +48,4 @@ To assist in the development of this API, the following resources are provided:
     
 2.  **Database Design**  
     The database schema for this project can be viewed at the following link:  
-    [ERD](docs/erd.png)
+    ![ERD](docs/erd.png)
