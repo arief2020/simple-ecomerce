@@ -310,7 +310,12 @@ mysql_maxOpenConnections=30
 mysql_minIdleConnections=10
 
 ```
-  
+  4. **Run the mysql database and make database for app**
+You can use platform like [xampp](https://www.apachefriends.org/) or [laragon](https://laragon.org/) to running the mysql database
+5. **Make migration and run the app**
+```
+go run app/main.go
+```
 
 ### Running in Docker
 
@@ -374,12 +379,8 @@ go mod tidy
 docker compose --env-file .env.development up --build -d
 
 ```
-6. **Run the mysql database and make database for app**
-You can use platform like [xampp](https://www.apachefriends.org/) or [laragon](https://laragon.org/) to running the mysql database
-7. **Make migration and run the app**
-```
-go run app/main.go
-```
+
+
 
 # How to Test the App
 
