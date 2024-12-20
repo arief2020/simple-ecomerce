@@ -43,7 +43,7 @@ type (
 )
 
 func loadEnv() {
-	projectDirName := "simple-ecomerce"  // change to workdir example: app
+	projectDirName := "simple-ecomerce"  // change to workdir app. example: app
 	projectName := regexp.MustCompile(`^(.*` + projectDirName + `)`)
 	currentWorkDirectory, _ := os.Getwd()
 	rootPath := projectName.Find([]byte(currentWorkDirectory))
