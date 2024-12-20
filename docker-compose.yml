@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go_fiber_app
+    restart: always
+    env_file: 
+      - .env.development
+    ports:
+      - "${httpport}:${httpport}" # Gunakan variabel dari .env
+    depends_on:
+      - mysql_db
+    networks:
+      - app_network
+
+  mysql_db:
+    image: mysql:8.0
+    container_name: mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${mysql_root_password}
+      MYSQL_DATABASE: ${mysql_dbname}
+      MYSQL_USER: ${mysql_username}
+      MYSQL_PASSWORD: ${mysql_password}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - app_network
+
+volumes:
+  mysql_data:
+
+networks:
+  app_network:
