@@ -18,9 +18,9 @@ import (
 	"github.com/gofiber/swagger"
 )
 
-// @title GoFiber Example API
+// @title Simple Ecomerce API
 // @version 1.0
-// @description Golang GoFiber swagger auto generate step by step by swaggo
+// @description This is a sample server
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.email fiber@swagger.io
